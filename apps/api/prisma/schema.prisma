@@ -10,12 +10,189 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("samples") // if you want to use snake_case format
+enum Gender {
+  MALE
+  FEMALE
 }
+
+enum Role {
+  user
+  warAdm
+  superAdm
+}
+
+enum ProductGender {
+  MEN
+  WOMEN
+  UNISEX
+}
+
+enum ProductTypes {
+  TOPS
+  BOTTOMS
+  ACCESSORIES
+}
+
+enum AlterationTypes {
+  MUTATION
+  RESTOCK
+  REMOVE
+  TRANSACTION
+}
+
+enum PaymentMethod {
+  MANUAL
+  GATEWAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  WAITING_CONFIRMATION
+  PROCESSED
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            String        @id @default(uuid())
+  role          Role          @default(user)
+  accountActive Boolean       @default(false)
+  username      String        @unique
+  email         String        @unique
+  password      String
+  gender        Gender
+  dob           DateTime
+  imgUrl        String
+  createdAt     DateTime      @default(now())
+  addresses     AddressList[]
+  orders        Order[]
+}
+
+model AddressList {
+  id          String  @id @default(uuid())
+  address     String
+  coordinate  String
+  userID      String
+  mainAddress Boolean @default(false)
+  user        User    @relation(fields: [userID], references: [id])
+}
+
+model Warehouse {
+  id            String             @id @default(uuid())
+  warehouseName String
+  city          String
+  coordinate    String
+  address       String
+  createdAt     DateTime           @default(now())
+  admins        WarehouseAdmin[]
+  products      WarehouseProduct[]
+  alterations   StockAlteration[]
+  orders        Order[]
+}
+
+model WarehouseAdmin {
+  id          String    @id @default(uuid())
+  warehouseID String
+  adminID     String    @unique
+  warehouse   Warehouse @relation(fields: [warehouseID], references: [id])
+}
+
+model WarehouseProduct {
+  id               Int            @id @default(autoincrement())
+  warehouseId      String
+  productVariantId Int
+  stock            Int
+  warehouse        Warehouse      @relation(fields: [warehouseId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+  Product          Product?       @relation(fields: [productId], references: [id])
+  productId        Int?
+}
+
+model Product {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  slug             String             @unique
+  description      String
+  price            Int
+  categoryId       Int
+  images           ProductImages[]
+  variants         ProductVariant[]
+  warehouseProduct WarehouseProduct[]
+  category         ProductCategory    @relation(fields: [categoryId], references: [id])
+}
+
+model ProductCategory {
+  id       Int           @id @default(autoincrement())
+  gender   ProductGender
+  type     ProductTypes
+  category String
+  products Product[]
+}
+
+model ProductImages {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  image     String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ProductVariant {
+  id               Int                @id @default(autoincrement())
+  productId        Int
+  size             String
+  color            String
+  image            String
+  product          Product            @relation(fields: [productId], references: [id])
+  warehouseProduct WarehouseProduct[]
+  orderItems       OrderItem[]
+  StockAlteration  StockAlteration[]
+}
+
+model StockAlteration {
+  id                Int             @id @default(autoincrement())
+  warehouseId       String
+  senderWarehouseId Int?
+  targetWarehouseId Int?
+  type              AlterationTypes
+  productVariantId  Int
+  quantity          Int
+  createdAt         DateTime        @default(now())
+  warehouse         Warehouse       @relation(fields: [warehouseId], references: [id])
+  productVariant    ProductVariant  @relation(fields: [productVariantId], references: [id])
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  userId        String
+  status        OrderStatus   @default(PENDING_PAYMENT)
+  paymentProof  String
+  warehouseId   String
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus
+  totalAmount   Int
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  user          User          @relation(fields: [userId], references: [id])
+  warehouse     Warehouse     @relation(fields: [warehouseId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id               String         @id @default(uuid())
+  orderId          String
+  productVariantId Int
+  quantity         Int
+  price            Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime
+  order            Order          @relation(fields: [orderId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+}
+
