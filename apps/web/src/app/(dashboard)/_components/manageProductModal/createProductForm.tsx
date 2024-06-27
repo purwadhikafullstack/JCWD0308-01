@@ -77,17 +77,17 @@ export function CreateProductForm({setOpen}:{setOpen:React.Dispatch<React.SetSta
         if (isInvalid) {
           toast.error("Product data is incomplete.")
         } else {   
-            let thumbnailURL = await uploadFile(thumbnail!, 'thumbnail')
+            let thumbnailURL = await uploadFile(thumbnail!)
             let additionalURL = []
             let colorVariant = []
             if (additionalImage.length > 0) {
               for (let i = 0; i<additionalImage.length; i++) {
-                const AdditionalImageURL = await uploadFile(additionalImage[i], 'additional')
+                const AdditionalImageURL = await uploadFile(additionalImage[i])
                 additionalURL.push(AdditionalImageURL)
               }
             }            
             for (let i = 0; i<color.length; i++) {
-              const variantImageURL = await uploadFile(color[i].image, 'variant')
+              const variantImageURL = await uploadFile(color[i].image)
               let data = {code: color[i].code, name: color[i].name, variantImageURL: variantImageURL}
               colorVariant.push(data)
             }

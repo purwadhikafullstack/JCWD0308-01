@@ -16,7 +16,6 @@ const [selectedWH, setSelectedWH] = useState('All Warehouses')
 const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
 const [productList, setProductList] = useState<IProduct[]>([])
 const [open, setOpen] = useState(false);
-const [openC, setOpenC] = useState(false);
 const [categoryLength, setCategoryLength] = useState(0) 
 const [productQty, setProductQty] = useState(0) 
 const [page, setPage] = useState(1)
@@ -40,7 +39,7 @@ const getData = async(wh:string) => {
     const category = await getCategory("", "")
     setProductList(product.productList)
     setProductQty(product.totalProduct)
-    setCategoryLength(category.totalCategory)
+    setCategoryLength(category.totalStock)
   }
 
   useEffect(() => {
@@ -52,7 +51,7 @@ const getData = async(wh:string) => {
       getData(selectedWH)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedWH, open , openC, page])
+  }, [selectedWH, open, page])
   
   
   return (
@@ -68,7 +67,7 @@ const getData = async(wh:string) => {
           <StatisticsCard 
             title='Categories'
             number={categoryLength}
-            modalElement={<ManageCategoryDialog isSuper={isSuper} setOpenC={setOpenC} openC={openC} />}
+            modalElement={<ManageCategoryDialog isSuper={isSuper}/>}
           />
         </div>
         <div className='flex flex-col w-full items-end mb-7'>

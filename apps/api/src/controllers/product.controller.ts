@@ -177,7 +177,7 @@ export class ProductController {
     async getProductBySlug(req: Request, res: Response) {
         try {
             const {slug} = req.params
-            const {w, s, v} = req.query
+            const {w, s} = req.query
             await prisma.$transaction(async (tx)=> {
                 if (w === "All Warehouses" || w === '') {
                     if (s) {
@@ -274,27 +274,11 @@ export class ProductController {
                             return total + variant.warehouseProduct.reduce((variantTotal:any, wp:any) => variantTotal + wp.stock, 0);
                             }, 0)
                         }
-
-                        const sizeSum = await tx.warehouseProduct.groupBy({
-                            by: ['size'!, 'productVariantID'],
-                            _sum: {
-                                stock: true
-                            }, 
-                            where: {
-                                productVariant: {
-                                    product: {
-                                        slug
-                                    }
-                                },
-                            },
-
-                        })
                         
                         return res.status(200).send({
                             status: 'ok',
                             message: 'product found',
-                            productList,
-                            sizeSum
+                            productList
                         })
                     }
                 } else {

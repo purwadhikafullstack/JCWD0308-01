@@ -13,10 +13,10 @@ export default function useStorage() {
     const [progress, setProgress] = useState<number>(0);
     const [error, setError] = useState<FileError | null>(null);
 
-    async function uploadFile(file: File, segment?: string): Promise<string> {
+    async function uploadFile(file: File): Promise<string> {
         return new Promise((resolve, reject) => {
             const fileID = uuid();
-            const storageRef = ref(storage, `${ segment }${ segment && '/' }${ fileID }`);
+            const storageRef = ref(storage, `${fileID}`);
             const uploadTask: UploadTask = uploadBytesResumable(storageRef, file);
             
             uploadTask.on('state_changed', (snapshot: UploadTaskSnapshot) => {

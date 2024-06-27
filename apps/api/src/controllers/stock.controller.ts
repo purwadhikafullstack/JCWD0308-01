@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import prisma from "@/prisma";
 import {v4 as uuidv4} from 'uuid'
 import { serverResponse } from "@/helpers/apiResponse";
-import { ProductSize } from "@prisma/client";
 
 
 
@@ -246,25 +245,5 @@ export class StockController {
         } catch (error:any) {
             serverResponse(res, 400, 'error', error)
         }
-    }
-
-    async getStockByVariant(req: Request, res: Response) {
-        try {
-            const {s} = req.query
-            const {variant} = req.params
-            const stock = await prisma.warehouseProduct.aggregate({
-                _sum: {
-                    stock: true
-                }, 
-                where: {
-                    productVariantID: String(variant),
-                    size: String(s).toUpperCase() as ProductSize
-                },
-            })
-            serverResponse(res, 200, 'ok', 'stock found', stock._sum)
-        } catch (error) {
-            serverResponse(res, 400, 'error', 'stock not found', error)
-        }
-        
     }
 }

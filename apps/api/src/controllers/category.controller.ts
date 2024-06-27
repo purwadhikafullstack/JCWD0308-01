@@ -15,14 +15,11 @@ export class CategoryController {
                     category: 'asc'
                   }
                 })
-
-                const totalCategory = await tx.productCategory.count()
                 
                 return res.status(200).send({
                     status: 'ok',
                     message: 'Categories found',
-                    category,
-                    totalCategory
+                    category
                   });
             }
             if (typeof gender === 'string' && !type) {

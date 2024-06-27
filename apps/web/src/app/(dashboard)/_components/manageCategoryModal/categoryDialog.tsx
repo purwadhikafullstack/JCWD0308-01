@@ -9,9 +9,9 @@ import {
 import { PiArrowSquareOut } from "react-icons/pi"
 import { ManageCategoryList } from "./categoryTypeList";
 
-export function ManageCategoryDialog({isSuper, setOpenC, openC }:{isSuper:boolean, setOpenC:React.Dispatch<React.SetStateAction<boolean>>, openC:boolean}) {
+export function ManageCategoryDialog({isSuper}:{isSuper:boolean}) {
   return (
-    <Dialog open={openC} onOpenChange={setOpenC}>
+    <Dialog>
       <DialogTrigger asChild>
         <div className={`flex items-center gap-1 border-b-2 max-sm:text-xs max-sm:border-b-[1px] border-b-black hover:bg-gray-100 hover:cursor-pointer`}>
             <p>{isSuper ?"Manage" : 'See list'}</p>

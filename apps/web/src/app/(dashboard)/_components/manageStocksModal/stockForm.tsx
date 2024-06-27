@@ -41,7 +41,7 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
   const [isValid, setIsValid] = useState(false)
 
   const getProdList = async() => {
-    const res = await getProductName('')
+    const res = await getProductName()
     const prodName = await res.data 
     setNameArr(prodName)
     setProduct(prodName[0].name)

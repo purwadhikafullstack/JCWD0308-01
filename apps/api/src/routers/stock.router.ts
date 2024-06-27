@@ -13,7 +13,6 @@ export class StockRouter {
 
     private initializeRoutes(): void {
         this.router.post('/', this.stockController.createStock)
-        this.router.get('/:variant', this.stockController.getStockByVariant)
     }
 
     getRouter() : Router{

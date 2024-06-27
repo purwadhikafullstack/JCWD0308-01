@@ -135,12 +135,3 @@ export async function changeStock(dataSet:any) {
   const data = await res.json()
   return data
 }
-
-export async function getVariantStock(varID:string, size:string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API_URL}stocks/${varID}?s=${size}`, {
-    method: 'GET', 
-    next: {revalidate: 1}
-  })
-  const data = await res.json()
-  return data
-}

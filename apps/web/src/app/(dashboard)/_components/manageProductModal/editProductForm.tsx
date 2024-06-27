@@ -36,6 +36,7 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
   const [gender, setGender] = useState('')
   const [type, setType] = useState('')
   const [category, setCategory] = useState('')
+  // const [isOneSize, setIsOneSize] = useState(false)
   const [color, setColor] = useState<IEditColor[]>([])
   const [currentThumbnail, setCurrentThumbnail] = useState('')
   const [thumbnail, setThumbnail] = useState<File | undefined>(undefined)
@@ -47,7 +48,7 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
   const [nameErrorMessage, setNameErrorMessage] = useState('')
   const [descErrorMessage, setDescErrorMessage] = useState('')
   const [priceErrorMessage, setPriceErrorMessage] = useState('')
-  const { uploadFile, progress, removeImageFromStorage } = useStorage();
+  const { uploadFile, progress } = useStorage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -114,8 +115,7 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
       toast.error("Product data is incomplete.")
     } else {
         let thumbnailURL = ''
-        if (thumbnail) {thumbnailURL = await uploadFile(thumbnail!, 'thumbnail')}
-        // if (thumbnail) {await removeImageFromStorage(currentThumbnail, 'thumbnail')}
+        if (thumbnail) {thumbnailURL = await uploadFile(thumbnail!)}
         let additionalURL = []
         let additionalDelete = []
         let colorVariantEdit = []
@@ -123,7 +123,7 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
         let colorVariantDelete = []
         for (let i = 0; i<color.length; i++) {
           if (color[i].isEdited && color[i].image) {
-            const variantImageURL = await uploadFile(color[i].image!, 'variant')
+            const variantImageURL = await uploadFile(color[i].image!)
             const data = {id:color[i].id , code: color[i].code, name: color[i].name, variantImageURL: variantImageURL}
             colorVariantEdit.push(data)
           } else if (color[i].isEdited) {
@@ -134,19 +134,17 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
             const data = {code: color[i].code, name: color[i].name, variantImageURL: variantImageURL}
             colorVariantNew.push(data)
           } else if (color[i].isDeleted) {
-            // await removeImageFromStorage(color[i].imageURL!, 'variant')
             colorVariantDelete.push(color[i].id)
           }
         }
         if (additionalImage.length > 0) {
           for (let i = 0; i<additionalImage.length; i++) {
-            const AdditionalImageURL = await uploadFile(additionalImage[i], 'additional')
+            const AdditionalImageURL = await uploadFile(additionalImage[i])
             additionalURL.push(AdditionalImageURL)
           }
         }
         for (let i = 0; i<currentAdditional.length; i++) {
           if (currentAdditional[i].isDeleted) {
-            // await removeImageFromStorage(currentAdditional[i].image!, 'additional')
             additionalDelete.push(currentAdditional[i].id)
           }
         }       
