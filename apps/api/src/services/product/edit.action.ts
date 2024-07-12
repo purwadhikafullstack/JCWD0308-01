@@ -1,33 +1,27 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ProductSize } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
 export async function editProduct(req: Request, res: Response) {
-    enum ProductSize {
-        S = 'S',
-        M = 'M',
-        L = 'L',
-        XL = 'XL'
-    }
+    const { slug } = req.params;
+    const { name, isVisible, description, price, thumbnailURL, additionalURL, additionalDelete, colorVariantEdit, colorVariantNew, colorVariantDelete, categoryData } = req.body;
+    const symbolRegex = /[^a-zA-Z0-9\s-]/;
+    if (name.length > 30 || name.length < 2 || name.trim().length === 0 || symbolRegex.test(name)) throw "Invalid name input."
+    if (description.length > 500 || description.length < 15 || description.trim().length === 0) throw "Invalid description input."
+    if (isNaN(price) || price < 1000) throw "Invalid price input."
+    if (!categoryData) throw "Invalid category input."
+    const sizeArray = ['S', 'M', 'L', 'XL']
+    const wareHouseList = await prisma.warehouse.findMany()
+    const productCategory = await prisma.productCategory.findFirst({
+        where: {
+            gender: categoryData.gender.toUpperCase(),
+            type: categoryData.type.toUpperCase(),
+            category: categoryData.category
+        }
+    });
     await prisma.$transaction(async (tx) => {
-        const { slug } = req.params;
-        const { name, isVisible, description, price, thumbnailURL, additionalURL, additionalDelete, colorVariantEdit, colorVariantNew, colorVariantDelete, categoryData } = req.body;
-        const symbolRegex = /[^a-zA-Z0-9\s-]/;
-        if (name.length > 30 || name.length < 2 || name.trim().length === 0 || symbolRegex.test(name)) throw "Invalid name input."
-        if (description.length > 500 || description.length < 15 || description.trim().length === 0) throw "Invalid description input."
-        if (isNaN(price) || price < 1000) throw "Invalid price input."
-        if (!categoryData) throw "Invalid category input."
-        const sizeArray: ProductSize[] = [ProductSize.S, ProductSize.M, ProductSize.L, ProductSize.XL];
-        const wareHouseList = await tx.warehouse.findMany()
-        const productCategory = await tx.productCategory.findFirst({
-            where: {
-                gender: categoryData.gender.toUpperCase(),
-                type: categoryData.type.toUpperCase(),
-                category: categoryData.category
-            }
-        });
         
         const product = await tx.product.update({
             data: {
@@ -121,7 +115,7 @@ export async function editProduct(req: Request, res: Response) {
                                     id: uuidv4(),
                                     warehouseID: wareHouseList[k].id,
                                     productVariantID: variant.id,
-                                    size: sizeArray[s],
+                                    size: sizeArray[s] as ProductSize,
                                     stock: 0
                                 }
                             })

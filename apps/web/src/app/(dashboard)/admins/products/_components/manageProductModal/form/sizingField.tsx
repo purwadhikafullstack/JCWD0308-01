@@ -18,7 +18,7 @@ export const SizingField = ({isOneSize, setIsOneSize}: {isOneSize:boolean, setIs
           </div>
           <div className="flex">
             <FormControl>
-              <div className='flex gap-2'>
+              <div className='flex gap-2 w-full max-sm:justify-center items-center'>
                 <Switch
                   className='focus-visible:border-[1px] focus-visible:border-black focus-visible:ring-transparent'
                   checked={isOneSize}

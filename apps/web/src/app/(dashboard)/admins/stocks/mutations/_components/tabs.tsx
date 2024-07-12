@@ -63,7 +63,7 @@ export function MutationTabs({selectedWH}:{selectedWH:string}) {
             <div className="mb-10">
               <div className="flex justify-between items-center pb-2 flex-wrap gap-y-2">
                 <div className="flex gap-1 items-center">
-                  <p className="font-semibold">Waiting Approval</p>
+                  <p className="max-md:text-sm font-semibold">Waiting Approval</p>
                   <MdOutlineScheduleSend className="text-2xl"/>
                 </div>
                 <MutationDialog open={open} setOpen={setOpen} selectedWH={selectedWH}/>
@@ -73,7 +73,7 @@ export function MutationTabs({selectedWH}:{selectedWH:string}) {
 
             <div>
               <div className="flex gap-1 items-center pb-2">
-                <p className="font-semibold">Request History</p>
+                <p className="max-md:text-sm font-semibold">Request History</p>
                 <PiClockCounterClockwiseBold className="text-2xl"/>
               </div>
               <RequestHistoryTable open={open} selectedWH={selectedWH} setOpen={setOpen} />
@@ -87,7 +87,7 @@ export function MutationTabs({selectedWH}:{selectedWH:string}) {
       <TabsContent value="transfer">
         <Card className="border-none shadow-none">
           <CardHeader className="px-0">
-            <CardTitle className="font-medium">Approve Transfer Requests</CardTitle>
+            <CardTitle className="max-md:text-sm font-semibold">Approve Transfer Requests</CardTitle>
             <CardDescription>
               Accept or reject stock transfer requests from other warehouses.
             </CardDescription>

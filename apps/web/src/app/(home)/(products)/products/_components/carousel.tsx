@@ -28,8 +28,6 @@ export function ProductCarousel({product, setIndex, index}:ICarousel) {
       setCurrent(num[0])
     }
   }, [, index, api])
-
-  console.log(current);
   
 
   useEffect(() => {

@@ -20,6 +20,7 @@ export const Catalogs = () => {
 
   useEffect(() => {
     const getData = async(p: number) => {
+      window.scrollTo(0, 0);
       setIsLoading(true)
       const gender = params.get('g')
       const type = params.get('t')
@@ -37,7 +38,7 @@ export const Catalogs = () => {
   }, [params, page, sort])
 
   return (
-    <div className={`w-full flex flex-col justify-between min-w-[332px] sm:min-w-[520px] xl:min-w-[800px] ${productQty == 0 && !isLoading ? 'h-[100vh]' : 'xl:h-[1510px]'}`}>
+    <div className={`w-full flex flex-col justify-between min-w-[332px] sm:min-w-[520px] xl:min-w-[800px] ${productQty == 0 && !isLoading ? 'h-[100vh]' : 'min-h-[50vh]'}`}>
       <div>
         <div className="flex justify-between mb-10 lg:px-5 xl:px-3">
           <div>

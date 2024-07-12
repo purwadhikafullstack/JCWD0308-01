@@ -25,7 +25,7 @@ export const Search = () => {
         setValue(value);
       },
       500
-  )
+    )
 
 	const handleSubmit = (e:any) => {
 		if (search.length > 0) {

@@ -123,3 +123,40 @@ export async function handleWarehouseDelete( warehouseID:string) {
             return 'stock emptied'
         })
 }
+
+export async function handleNewWarehouseStock(warehouseID:string) {
+    const sizeArray = ['S', 'M', 'L', 'XL']
+    const productList = await prisma.product.findMany()
+
+    for (let i=0; i<productList.length; i++) {
+        const variants = await prisma.productVariant.findMany({
+            where: {
+                productID: productList[i].id
+            }
+        })
+
+        for (let v=0; v<variants.length; v++) {
+            if (productList[i].oneSize) {
+                await prisma.warehouseProduct.create({
+                    data: {
+                        warehouseID: warehouseID,   
+                        productVariantID: variants[v].id,
+                        size: 'ONESIZE',              
+                        stock: 0       
+                    }
+                })
+            } else {
+                for (let z=0; z<sizeArray.length; z++) {
+                    await prisma.warehouseProduct.create({
+                        data: {
+                            warehouseID: warehouseID,   
+                            productVariantID: variants[v].id,
+                            size: sizeArray[z] as ProductSize,              
+                            stock: 0       
+                        }
+                    })
+                }
+            }
+        }
+    }
+}

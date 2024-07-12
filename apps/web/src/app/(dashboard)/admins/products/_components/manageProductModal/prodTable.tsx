@@ -45,7 +45,7 @@ interface IProdTable {
           <TableRow>
             <TableHead className={`${isSuper ? '' : 'hidden'}text-center`}></TableHead>
             <TableHead className="min-w-[100px] sm:min-w-[200px]">Product Name</TableHead>
-            <TableHead className="text-center min-w-[100px] sm:min-w-[200px]">Product ID</TableHead>
+            {/* <TableHead className="text-center min-w-[100px] sm:min-w-[200px]">Product ID</TableHead> */}
             <TableHead className="text-center">Gender</TableHead>
             <TableHead className="text-center">Type</TableHead>
             <TableHead className="text-center">Category</TableHead>
@@ -57,7 +57,7 @@ interface IProdTable {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {productList ? 
+          {productList && productList.length > 0 ? 
             productList.map((product, index) => {
             const date = DateConvert(product.createdAt)
             let dateU 
@@ -89,7 +89,7 @@ interface IProdTable {
                 </div>
               </TableCell>
               <TableCell className="text-pretty font-semibold min-w-[100px] sm:min-w-[200px]">{product.name}</TableCell>
-              <TableCell className="min-w-[100px] sm:min-w-[200px]">{product.id}</TableCell>
+              {/* <TableCell className="min-w-[100px] sm:min-w-[200px]">{product.id}</TableCell> */}
               <TableCell className="text-center">{product.category.gender.toLocaleLowerCase()}</TableCell>
               <TableCell className="text-center">{product.category.type.toLocaleLowerCase()}</TableCell>
               <TableCell className="text-center">{product.category.category}</TableCell>

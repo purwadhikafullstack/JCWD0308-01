@@ -20,7 +20,7 @@ export function WarehouseDropdown({ selectedWH, setSelectedWH, warehouseList, is
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="text-sm md:text-4xl px-2 font-bold md:font-semibold bg-white/80 rounded-none border-b-2 border-b-black">
+        <Button variant="ghost" className="text-sm md:text-4xl px-2 font-bold md:font-semibold bg-white/90 rounded-none border-b-2 border-b-black">
           <PiCaretCircleDownFill className="text-sm md:text-xl mr-2" /> 
           {selectedWH}
         </Button>

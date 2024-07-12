@@ -164,15 +164,11 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
       }
     }
 
-    console.log(isVisible);
-    
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full pt-5 ">
         <div className="flex max-md:flex-wrap w-full gap-5">
           <ScrollArea className="h-[500px] md:w-[200px] bg-gray-100 rounded-sm max-md:hidden p-4">
-            
             <ImageField 
               currentAdditional={currentAdditional}
               currentThumbnail={currentThumbnail}
@@ -204,11 +200,6 @@ export function EditProductForm({setOpen, slug}:{slug:string, setOpen:React.Disp
                 invalidCategory={invalidCategory}
                 category={category}
               />
-            {/* <Separator className="my-7"/> */}
-              {/* <SizingField 
-                isOneSize={isOneSize}
-                setIsOneSize={setIsOneSize}
-              /> */}
             <Separator className="my-7"/>
               <EditColorField
                 setColor={setColor}

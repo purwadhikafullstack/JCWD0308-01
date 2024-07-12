@@ -11,6 +11,7 @@ import { EditStockTable } from './editStockTable'
 import { CancelAlert } from '@/components/cancelAlertTemplate'
 import { SubmitAlert } from '@/components/submitAlertTemplate'
 import { toast } from 'sonner'
+import { StockSelector } from './stockSelector'
 
 interface IDropdown {
     selectedWH:string,
@@ -39,13 +40,9 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
   const [updateType, setUpdateType] = useState('RESTOCK')
   const [stockArray, setStockArray] = useState<IStockArray[]>([])
   const [isValid, setIsValid] = useState(false)
+  const [search, setSearch] = useState('')
 
-  const getProdList = async() => {
-    const res = await getProductName('')
-    const prodName = await res.data 
-    setNameArr(prodName)
-    setProduct(prodName[0].name)
-  }
+ 
 
   const getData = async() => {
     if (product) {
@@ -62,15 +59,19 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
       if (!isValid) {
         toast.error('Stock data is incomplete.')
       } else {
+        const loadingToast = toast.loading('Updating stocks, please wait.')
+        loadingToast
         const stockInput = {warehouseName: warehouse,type: updateType,variant: [...stockArray]}
         const res = await changeStock(stockInput)
         if (res.status === 'ok') {
+          toast.dismiss(loadingToast)
           toast.success('Stock successfully updated. Stock changes added to log.')
           setStockArray([])
           getData()
           setOpen(false)
         } else {
-          toast.error('error')
+          toast.dismiss(loadingToast)
+          typeof(res.message) == 'string' ? toast.error(res.message) : toast.error('Failed to update stock.')
         }
       }
     } catch (error) {
@@ -79,8 +80,19 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
   }
 
   useEffect(() => {
+    const getProdList = async() => {
+      try {   
+        const res = await getProductName(search)
+        if (res.data.length == 0) throw "No product found."
+        const prodName = await res.data 
+        setNameArr(prodName)
+        setProduct(prodName[0].name)
+      } catch (error:any) {
+        typeof(error) == 'string' ?  toast.error(error) : toast.error('Failed to get products.')
+        }
+      }
     getProdList()
-  }, [])
+  }, [search])
   
   useEffect(() => {
     getData()
@@ -88,18 +100,20 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
   }, [product, warehouse, size])
 
   return (
-    <div className='overflow-x-hidden'>
+    <div className='overflow-x-hidden space-y-8'>
     <div className='mt-7 flex max-md:flex-col gap-5 w-full'>
       <div className='sm:w-[250px] w-full bg-gray-100 rounded-sm p-4 items-center justify-between max-md:hidden'>
         <div>
           <Label className="font-bold text-base block mb-2">Select Product</Label>
-          <Selector 
-              width='max-sm:w-32 w-[168px]'
-              label="products"
-              defValue={product}
-              state={nameArr.map(item => item.name)}
-              setState={setProduct}
-          />
+          
+          <StockSelector 
+                  width='max-sm:w-32 w-[168px]'
+                  label="products"
+                  defValue={product}
+                  state={nameArr.map(item => item.name)}
+                  setState={setProduct}
+                  setSearch={setSearch}
+              />
         </div>
         <Image
           width={168}
@@ -113,12 +127,13 @@ export const StockForm = ({selectedWH, warehouseList, setOpen}:IDropdown) => {
           <div className='w-full bg-gray-100 rounded-sm p-4 max-md:flex items-center justify-between md:hidden'>
             <div>
               <Label className="font-bold text-base block mb-2">Select Product</Label>
-              <Selector 
+              <StockSelector 
                   width='max-sm:w-32 w-[168px]'
                   label="products"
                   defValue={product}
                   state={nameArr.map(item => item.name)}
                   setState={setProduct}
+                  setSearch={setSearch}
               />
             </div>
             <Image

@@ -12,19 +12,21 @@ import AddToCartButton from '@/components/cart/AddToCartButton';
 interface ICarousel {
     product:IProduct
     setIndex: React.Dispatch<React.SetStateAction<number>>
-    index: number
     sizeSum: ISizeSum[]
   }
+
+  
   
 
-export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
+export const ProductMenu = ({product, setIndex, sizeSum}:ICarousel) => {
     const sizeOrder = ["S", "M", "L", "XL"];
     const [colorID, setColorID] = useState(product.variants[0].id)
     const [color, setColor] = useState(product.variants[0].color)
     const [size, setSize] = useState(product.oneSize ? 'ONESIZE' : 'S')
     const [stock, setStock] = useState(0)
     const [qty, setQty] = useState(0)
-    console.log({colorID, color, size, stock, qty});
+
+    
     
     
     useEffect(() => {
@@ -88,7 +90,8 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
                     ${item._sum.stock == 0 ? 'bg-gray-200 text-gray-400 border-gray-400' : ''} 
                     ${size == item.size ? 'border-[2px] font-semibold' : ''} 
                     border-[1px] border-black flex justify-center items-center`} 
-                    onClick={() => setSize(item.size)}>
+                    onClick={() => setSize(item.size)}
+                    >
                         {item.size}
                     </button>
                 );

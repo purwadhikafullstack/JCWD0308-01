@@ -29,7 +29,6 @@ export const NameField = ({name, setName, nameErrorMessage, setNameErrorMessage}
       setNameErrorMessage('');
     }
     setName(name);
-    console.log(nameErrorMessage);
   }
 
   return (

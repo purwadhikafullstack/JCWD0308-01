@@ -3,7 +3,7 @@ import { getProductSlug } from "@/app/action";
 import { Separator } from "@/components/ui/separator";
 import { ProductMenu } from "../_components/menu";
 import { ProductCarousel } from "../_components/carousel";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IProduct, ISizeSum } from "@/constants";
 import {
@@ -16,6 +16,8 @@ import Link from "next/link";
 import { RowCarousel } from "../_components/rowCarousel";
 import { RecommendedCarousel } from "../_components/recomendedCarousel";
 import { Breadcrumbs } from "../_components/breadcrumbs";
+import { toast } from "sonner";
+import { ProductSkeleton } from "../_components/skeleton";
 
 
 
@@ -27,21 +29,27 @@ export default function Page() {
     const [category, setCategory] = useState('')
     const [index, setIndex] = useState(0)
     const [sizeSum, setSizeSum] = useState<ISizeSum[]>([])
+    const router = useRouter()
 
 
     useEffect(() => {
     const getData = async() => {
-        const data = await getProductSlug(String(slug), '', '')
-        if (data.status == 'ok') {
+        try {
+            const data = await getProductSlug(String(slug), '', '')
+            if (data.status == 'error') throw data.message
             setProduct(data.productList)
             setSizeSum(data.sizeSum)
             setGender(String(data.productList.category.gender).at(0) + String(data.productList.category.gender).slice(1).toLowerCase())
             setType(String(data.productList.category.type).at(0) + String(data.productList.category.type).slice(1).toLowerCase())
             setCategory(String(data.productList.category.category).at(0) + String(data.productList.category.category).slice(1).toLowerCase())
+        } catch (error:any) {
+            typeof(error) == 'string' ? toast.error(error) :  toast.error('Failed to get product informations.')
+            router.push('/catalogs')
         }
+       
     }
     getData()
-    }, [slug])
+    }, [slug, router])
 
     return (
         <div className="w-full min-h-[100vh] flex justify-center">
@@ -64,7 +72,6 @@ export default function Page() {
                                     </div>
                                     <Separator className="mt-3 mb-5"/>
                                     <ProductMenu 
-                                    index={index}
                                     setIndex={setIndex}
                                     product={product}
                                     sizeSum={sizeSum}
@@ -118,7 +125,6 @@ export default function Page() {
                                 </div>
                                 <Separator className="my-3"/>
                                 <ProductMenu 
-                                index={index}
                                 setIndex={setIndex}
                                 product={product}
                                 sizeSum={sizeSum}
@@ -134,7 +140,7 @@ export default function Page() {
                 </div>
                 
                 :
-                <div className="h-screen">...loading</div>
+                <ProductSkeleton />
             }
         </div>
     )

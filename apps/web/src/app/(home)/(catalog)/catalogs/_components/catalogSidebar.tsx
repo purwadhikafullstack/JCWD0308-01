@@ -35,7 +35,7 @@ export const CatalogSidebar = () => {
         <div className='mt-5 flex'>
           <Link href={`/catalogs?g=${(gender.toLowerCase())}`}>
           <p 
-          className={`text-black text-sm hover:font-semibold duration-200 ${activeCat.c == '' && activeCat.t == ''  && activeCat.g.toLowerCase() ? 'font-semibold' : ''}`}
+          className={`text-black text-sm hover:font-semibold duration-200 ${activeCat.c == '' && activeCat.t == ''  && activeCat.g.toLowerCase() == gender.toLowerCase() ? 'font-semibold' : ''}`}
           >{`All ${gender.at(0) + gender.toLowerCase().slice(1)}'s Collections`}</p>
           </Link>
         </div>

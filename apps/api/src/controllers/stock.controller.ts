@@ -17,14 +17,171 @@ export class StockController {
             const mutationType = type.toUpperCase() 
             const warehouseCheck = await prisma.warehouse.findFirst()
             if (!warehouseCheck) throw 'There is no existing warehouse.'           
-                
-                if (warehouseName === "All Warehouses" || warehouseName==='') {
-                    const wareHouseList = await prisma.warehouse.findMany()
-                    for (let w = 0; w < wareHouseList.length; w++) {
-                        const stockMutation = await prisma.stockMutation.create({
+            
+            if (warehouseName === "All Warehouses" || warehouseName==='') {
+                const wareHouseList = await prisma.warehouse.findMany({
+                        where: {
+                            isActive: true
+                        }
+                    })
+                    await prisma.$transaction(async (tx) => {
+                        for (let w = 0; w < wareHouseList.length; w++) {
+                            const stockMutation = await tx.stockMutation.create({
+                                data: {
+                                    id: uuidv4(),
+                                    warehouseID: wareHouseList[w].id,
+                                    type: mutationType
+                                }
+                            })
+                            for (let i = 0; i<variant.length; i++) {
+                                if (variant[i].size === "All Sizes") {
+                                    for (let k = 0; k<sizeArray.length; k++) {
+                                        let currentStock
+                                         currentStock = await tx.warehouseProduct.findFirst({
+                                            where: {
+                                                productVariantID: variant[i].id,
+                                                size: sizeArray[k],
+                                                warehouseID: stockMutation.warehouseID
+                                                
+                                            }, include: {
+                                                productVariant: {
+                                                    include: {
+                                                        product: {
+                                                            select:{
+                                                                name:true
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        if (!currentStock) {
+                                            currentStock = await tx.warehouseProduct.create({
+                                                data: {
+                                                    id: uuidv4(),
+                                                    size: sizeArray[k],
+                                                    stock: 0,
+                                                    isDelete: false,
+                                                    productVariantID: variant[i].id,
+                                                    warehouseID: stockMutation.warehouseID
+                                                }, include: {
+                                                    productVariant: {
+                                                        include: {
+                                                            product: {
+                                                                select:{
+                                                                    name:true
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })
+                                        }
+                                        if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList[w].warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${sizeArray[k]})` 
+                                        const newStockLog = await tx.stockMutationItem.create({
+                                            data: {
+                                                id: uuidv4(),
+                                                quantity: variant[i].qty,
+                                                stockMutationID: stockMutation.id,
+                                                warehouseProductID: currentStock!.id
+                                            }
+                                        })
+                                        await tx.warehouseProduct.update({
+                                            where: {
+                                                id: currentStock?.id,
+                                            }, 
+                                            data:{
+                                                stock: Number(mutationType == "RESTOCK" || mutationType === "INBOUND"
+                                                    ? newStockLog.quantity + currentStock!.stock 
+                                                    : currentStock!.stock > newStockLog.quantity
+                                                    ? currentStock!.stock - newStockLog.quantity
+                                                    : 0
+                                                ),
+                                                updatedAt: new Date()
+                                            }
+                                        })
+                                    }
+                                } 
+                                else {
+                                    let currentStock
+                                    currentStock = await tx.warehouseProduct.findFirst({
+                                        where: {
+                                            productVariantID: variant[i].id,
+                                            size: variant[i].size.toUpperCase(),
+                                            warehouseID: stockMutation.warehouseID
+                                        }, include: {
+                                            productVariant: {
+                                                include: {
+                                                    product: {
+                                                        select:{
+                                                            name:true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }) 
+                                    if (!currentStock) {
+                                        currentStock = await tx.warehouseProduct.create({
+                                            data: {
+                                                id: uuidv4(),
+                                                size: variant[i].size.toUpperCase(),
+                                                stock: 0,
+                                                isDelete: false,
+                                                productVariantID: variant[i].id,
+                                                warehouseID: stockMutation.warehouseID
+                                            }, include: {
+                                                productVariant: {
+                                                    include: {
+                                                        product: {
+                                                            select:{
+                                                                name:true
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+                                    if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at  ${wareHouseList[w].warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${variant[i].size.toUpperCase()}`       
+                                    const newStockLog = await tx.stockMutationItem.create({
+                                        data: {
+                                            id: uuidv4(),
+                                            quantity: variant[i].qty,
+                                            stockMutationID: stockMutation.id,
+                                            warehouseProductID: currentStock!.id
+                                        }
+                                    })                                                          
+                                    await tx.warehouseProduct.update({
+                                        where: {
+                                            id: currentStock?.id,
+                                        }, 
+                                        data: {
+                                            stock: Number(mutationType == "RESTOCK" || mutationType === "INBOUND"
+                                                ? newStockLog.quantity + currentStock!.stock 
+                                                : currentStock!.stock > newStockLog.quantity
+                                                ? currentStock!.stock - newStockLog.quantity
+                                                : 0
+                                            )
+                                        }
+                                    })                              
+                                }
+                            }
+                        }
+                    })
+                } else {
+                    await prisma.$transaction(async (tx) => {
+                        const wareHouseList = await tx.warehouse.findFirst({
+                            where: {
+                                warehouseName,
+                                isActive: true
+                            }
+                        })
+                        if (!wareHouseList) throw "Warehouse is inactive, please activate the warehouse."                  
+                        const stockMutation = await tx.stockMutation.create({
                             data: {
                                 id: uuidv4(),
-                                warehouseID: wareHouseList[w].id,
+                                warehouseID: wareHouseList!.id,
                                 type: mutationType
                             }
                         })
@@ -32,7 +189,7 @@ export class StockController {
                             if (variant[i].size === "All Sizes") {
                                 for (let k = 0; k<sizeArray.length; k++) {
                                     let currentStock
-                                     currentStock = await prisma.warehouseProduct.findFirst({
+                                    currentStock = await tx.warehouseProduct.findFirst({
                                         where: {
                                             productVariantID: variant[i].id,
                                             size: sizeArray[k],
@@ -50,7 +207,7 @@ export class StockController {
                                         }
                                     })
                                     if (!currentStock) {
-                                        currentStock = await prisma.warehouseProduct.create({
+                                        currentStock = await tx.warehouseProduct.create({
                                             data: {
                                                 id: uuidv4(),
                                                 size: sizeArray[k],
@@ -71,8 +228,8 @@ export class StockController {
                                             }
                                         })
                                     }
-                                    if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList[w].warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${sizeArray[k]})` 
-                                    const newStockLog = await prisma.stockMutationItem.create({
+                                    if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList!.warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${sizeArray[k]})` 
+                                    const newStockLog = await tx.stockMutationItem.create({
                                         data: {
                                             id: uuidv4(),
                                             quantity: variant[i].qty,
@@ -80,7 +237,7 @@ export class StockController {
                                             warehouseProductID: currentStock!.id
                                         }
                                     })
-                                    await prisma.warehouseProduct.update({
+                                    await tx.warehouseProduct.update({
                                         where: {
                                             id: currentStock?.id,
                                         }, 
@@ -95,10 +252,9 @@ export class StockController {
                                         }
                                     })
                                 }
-                            } 
-                            else {
+                            } else {
                                 let currentStock
-                                currentStock = await prisma.warehouseProduct.findFirst({
+                                currentStock = await tx.warehouseProduct.findFirst({
                                     where: {
                                         productVariantID: variant[i].id,
                                         size: variant[i].size.toUpperCase(),
@@ -114,9 +270,9 @@ export class StockController {
                                             }
                                         }
                                     }
-                                }) 
+                                })  
                                 if (!currentStock) {
-                                    currentStock = await prisma.warehouseProduct.create({
+                                    currentStock = await tx.warehouseProduct.create({
                                         data: {
                                             id: uuidv4(),
                                             size: variant[i].size.toUpperCase(),
@@ -137,16 +293,16 @@ export class StockController {
                                         }
                                     })
                                 }
-                                if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at  ${wareHouseList[w].warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${variant[i].size.toUpperCase()}`       
-                                const newStockLog = await prisma.stockMutationItem.create({
+                                if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList!.warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${variant[i].size.toUpperCase()})`       
+                                const newStockLog = await tx.stockMutationItem.create({
                                     data: {
                                         id: uuidv4(),
                                         quantity: variant[i].qty,
                                         stockMutationID: stockMutation.id,
                                         warehouseProductID: currentStock!.id
                                     }
-                                })                                                          
-                                await prisma.warehouseProduct.update({
+                                })                                                       
+                                await tx.warehouseProduct.update({
                                     where: {
                                         id: currentStock?.id,
                                     }, 
@@ -158,157 +314,10 @@ export class StockController {
                                             : 0
                                         )
                                     }
-                                })                              
+                                })     
                             }
-                        }
-                    }
-                } else {
-                    const wareHouseList = await prisma.warehouse.findFirst({
-                        where: {
-                            warehouseName
                         }
                     })
-                    if (!wareHouseList) throw "Invalid warehouse."
-                    if (!wareHouseList) throw "Warehouse not found."                    
-                    const stockMutation = await prisma.stockMutation.create({
-                        data: {
-                            id: uuidv4(),
-                            warehouseID: wareHouseList!.id,
-                            type: mutationType
-                        }
-                    })
-                    for (let i = 0; i<variant.length; i++) {
-                        if (variant[i].size === "All Sizes") {
-                            for (let k = 0; k<sizeArray.length; k++) {
-                                let currentStock
-                                currentStock = await prisma.warehouseProduct.findFirst({
-                                    where: {
-                                        productVariantID: variant[i].id,
-                                        size: sizeArray[k],
-                                        warehouseID: stockMutation.warehouseID
-                                    }, include: {
-                                        productVariant: {
-                                            include: {
-                                                product: {
-                                                    select:{
-                                                        name:true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                                if (!currentStock) {
-                                    currentStock = await prisma.warehouseProduct.create({
-                                        data: {
-                                            id: uuidv4(),
-                                            size: sizeArray[k],
-                                            stock: 0,
-                                            isDelete: false,
-                                            productVariantID: variant[i].id,
-                                            warehouseID: stockMutation.warehouseID
-                                        }, include: {
-                                            productVariant: {
-                                                include: {
-                                                    product: {
-                                                        select:{
-                                                            name:true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    })
-                                }
-                                if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList!.warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${sizeArray[k]})` 
-                                const newStockLog = await prisma.stockMutationItem.create({
-                                    data: {
-                                        id: uuidv4(),
-                                        quantity: variant[i].qty,
-                                        stockMutationID: stockMutation.id,
-                                        warehouseProductID: currentStock!.id
-                                    }
-                                })
-                                await prisma.warehouseProduct.update({
-                                    where: {
-                                        id: currentStock?.id,
-                                    }, 
-                                    data:{
-                                        stock: Number(mutationType == "RESTOCK" || mutationType === "INBOUND"
-                                            ? newStockLog.quantity + currentStock!.stock 
-                                            : currentStock!.stock > newStockLog.quantity
-                                            ? currentStock!.stock - newStockLog.quantity
-                                            : 0
-                                        ),
-                                        updatedAt: new Date()
-                                    }
-                                })
-                            }
-                        } else {
-                            let currentStock
-                            currentStock = await prisma.warehouseProduct.findFirst({
-                                where: {
-                                    productVariantID: variant[i].id,
-                                    size: variant[i].size.toUpperCase(),
-                                    warehouseID: stockMutation.warehouseID
-                                }, include: {
-                                    productVariant: {
-                                        include: {
-                                            product: {
-                                                select:{
-                                                    name:true
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            })  
-                            if (!currentStock) {
-                                currentStock = await prisma.warehouseProduct.create({
-                                    data: {
-                                        id: uuidv4(),
-                                        size: variant[i].size.toUpperCase(),
-                                        stock: 0,
-                                        isDelete: false,
-                                        productVariantID: variant[i].id,
-                                        warehouseID: stockMutation.warehouseID
-                                    }, include: {
-                                        productVariant: {
-                                            include: {
-                                                product: {
-                                                    select:{
-                                                        name:true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                            }
-                            if (currentStock!.stock < variant[i].qty && type == "REMOVE") throw `Failed to remove, insufficient stock at ${wareHouseList!.warehouseName} (${currentStock!.stock}, ${currentStock?.productVariant.color}, ${variant[i].size.toUpperCase()})`       
-                            const newStockLog = await prisma.stockMutationItem.create({
-                                data: {
-                                    id: uuidv4(),
-                                    quantity: variant[i].qty,
-                                    stockMutationID: stockMutation.id,
-                                    warehouseProductID: currentStock!.id
-                                }
-                            })                                                       
-                            await prisma.warehouseProduct.update({
-                                where: {
-                                    id: currentStock?.id,
-                                }, 
-                                data: {
-                                    stock: Number(mutationType == "RESTOCK" || mutationType === "INBOUND"
-                                        ? newStockLog.quantity + currentStock!.stock 
-                                        : currentStock!.stock > newStockLog.quantity
-                                        ? currentStock!.stock - newStockLog.quantity
-                                        : 0
-                                    )
-                                }
-                            })     
-                        }
-                    }
                 } 
                 const getProduct = await prisma.productVariant.findUnique({
                     where: {
@@ -589,6 +598,8 @@ export class StockController {
                         },
                     },
                     });
+
+                    console.log(toDateStockIn);
                     
                 
                     const toDateStockOut = await prisma.stockMutationItem.aggregate({
@@ -597,6 +608,11 @@ export class StockController {
                     },
                     where: {
                         WarehouseProduct: {
+                        warehouse: {
+                            warehouseName: w
+                            ? String(w)
+                            : {not: undefined}
+                        },
                         productVariant: {
                             product: {
                             id: product.id
@@ -619,6 +635,8 @@ export class StockController {
                         },
                     },
                     });
+                    
+                    console.log(toDateStockOut);
 
                     const toDateStock = (toDateStockIn._sum.quantity?  toDateStockIn._sum.quantity : 0) - (toDateStockOut._sum.quantity ? toDateStockOut._sum.quantity : 0)
                 
@@ -629,8 +647,8 @@ export class StockController {
                     toDateStock,
                     totalStock:totalStock._sum.stock
                     };
-                }));                      
-
+                }));      
+                
                 const totalStock = await tx.warehouseProduct.aggregate({
                     _sum: {
                         stock: true
@@ -700,6 +718,14 @@ export class StockController {
         
         let size = s == 'One Size' ? 'ONESIZE' : String(s).toUpperCase() 
         try {
+            const validSlug = await prisma.product.findFirst({
+                where: {
+                    slug
+                }
+            })
+
+            if (!validSlug) throw 'No product found.'
+
             const stocks = await prisma.stockMutationItem.findMany({
                 where: {
                     WarehouseProduct: {

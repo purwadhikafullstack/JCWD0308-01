@@ -294,7 +294,7 @@ export class MutationController {
             }
           })
 
-          if (whProductAsc.stock < mutation.StockMutationItem[0].quantity) throw 'Stock at warehouse is lower than requested ammount.'
+          if (whProductAsc.stock < mutation.StockMutationItem[0].quantity) throw 'Stock at warehouse is lower than requested amount.'
           
           const wpUpdateAsc = await tx.warehouseProduct.update({
             where: {

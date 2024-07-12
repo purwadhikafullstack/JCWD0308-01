@@ -25,7 +25,7 @@ import { PiCaretLeftBold, PiCaretRightBold } from "react-icons/pi";
 
 
     return (
-      <Pagination>
+      <Pagination className="mt-2">
           <PaginationContent className="gap-0">
             <PaginationItem>
               <PaginationLink href={`#${page}`}  className={'mr-1'} onClick={() =>{ if (page - 1 > 0) setPage(page - 1)}}><PiCaretLeftBold /></PaginationLink>

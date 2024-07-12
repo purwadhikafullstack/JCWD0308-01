@@ -24,7 +24,7 @@ interface IStockTable {
   export function SalesTable({salesList, setPage, page, productQty}:IStockTable) {
     return (
       <div>
-        <Table className="my-7">
+        <Table className="my-7 text-[0.82rem]">
           {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
           <TableHeader>
             <TableRow>
