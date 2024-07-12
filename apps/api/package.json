@@ -8,7 +8,7 @@
     },
 "scripts": {
   "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
-  "build": "tsc && tsc-alias && xcopy /E /I /Y src\\templates dist\\src\\templates",
+  "build": "tsc && tsc-alias && cp -r src/templates dist/src/",
   "serve": "cross-env NODE_ENV=production node dist/src/index.js",
   "test": "echo \"Error: no test specified\" && exit 1",
   "prisma": "npx prisma"
