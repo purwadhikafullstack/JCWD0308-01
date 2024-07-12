@@ -11,7 +11,7 @@ export default function Campaign() {
     return (
         <div className="relative">
             <div className="flex relative">
-                <Image priority width={800} height={100}
+                <Image priority width={1000} height={100}
                 className="sm:max-h-[25rem] w-full object-cover" style={{objectPosition: '50% 70%'}} src={imgUrl} alt="" />
             </div>
             <div className="
