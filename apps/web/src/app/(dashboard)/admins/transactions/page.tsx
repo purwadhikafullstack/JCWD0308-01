@@ -7,6 +7,8 @@ import { getAdminClientSide } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { WarehouseDropdown } from '../../_components/warehouseDropdown'
 import { toast } from 'sonner'
+import DashboardWrapper from '../_components/DashboardWrapper'
+import DashboardHeaderPhoto from '../_components/DashboardHeaderPhoto'
 
 export default function Page() {
   const [selectedWH, setSelectedWH] = useState('')
@@ -38,23 +40,19 @@ export default function Page() {
   }, []);
 
   return (
-    <section className='flex flex-col w-full min-h-screen py-10 px-10 md:px-20'>
-      <div className='flex w-full mb-7 flex-col-reverse xl:flex-row'>
-        <div className='flex flex-col w-full items-end mb-7'>
-          <p className='text-xl'>Warehouse</p>
-          <WarehouseDropdown
-            selectedWH={selectedWH}
-            setSelectedWH={setSelectedWH}
-            warehouseList={warehouseList}
-            isSuper={isSuper}
-          />
+      <DashboardWrapper className='relative'>
+        <DashboardHeaderPhoto imgUrl={'https://images.pexels.com/photos/12935051/pexels-photo-12935051.jpeg'} />
+        <div className='flex flex-col w-full items-start mb-[14.5rem] relative z-[1]'>
+            <WarehouseDropdown
+                selectedWH={selectedWH}
+                setSelectedWH={setSelectedWH}
+                warehouseList={warehouseList}
+                isSuper={isSuper}
+            />
         </div>
-      </div>
 
-      <DisplayOrder warehouse={selectedWH}/>
+        <DisplayOrder warehouse={selectedWH}/>
 
-
-
-    </section>
+      </DashboardWrapper>
   )
 }

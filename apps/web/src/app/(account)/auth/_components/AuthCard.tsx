@@ -130,7 +130,7 @@ export function AuthCard() {
                     setTimeout(() => { router.push(nextUrl) }, 2000);
                 } else {
                     toast.success(`Welcome, ${account.role ? account.fullName : account.username }`, { description: `redirecting you to ${account.role ? 'dashboard' : 'homepage'}..` })
-                    setTimeout(() => { router.push(account.role ? '/admins/overview' : '/' ) }, 2000);
+                    setTimeout(() => { router.push(account.role ? '/admins/products' : '/' ) }, 2000);
                 }
             } else if (res.status == 401) {
                 toast.error("Password incorrect")

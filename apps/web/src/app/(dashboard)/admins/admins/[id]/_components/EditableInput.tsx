@@ -41,7 +41,7 @@ export default function EditableInput({ inputType, data, classNameHead, head, de
                     } else if(res.success.message == "Email has been taken!") {
                         toast.error(res.success.message)
                     } else {
-                        toast.success(`${data.fullName}'s email has been updated!`)
+                        toast.success(`An email has been sent to ${data.fullName}'s new email!`)
                         setTimeout(() => {
                             toast(`Please inform ${data.fullName} to check ${ data.gender == 'MALE' ? 'his' : 'her' } new email address to re-verify ${ data.gender == 'MALE' ? 'his' : 'her' } account`)
                         }, 2500);

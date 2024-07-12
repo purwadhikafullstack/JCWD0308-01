@@ -116,15 +116,15 @@ export class AdminController {
 
     async editEmail(req: Request, res: Response) {
         try {
+            const { email } = req.body
             const admin = await prisma.admin.findFirst({ where: { id: req.params.id }})
             if (!admin) return serverResponse(res, 404, 'error', 'account not found')
             const existingUserEmail = await prisma.user.findUnique({ where : { email: req.body.email }})
             const existingAdminEmail = await prisma.admin.findUnique({ where : { email: req.body.email }})
             if (existingAdminEmail || existingUserEmail) return serverResponse(res, 409, 'error', 'Email has been taken!')
-
-            await prisma.admin.update({ where: { id: admin.id }, data: { accountActive: false, email: req.body.email } })
+            await prisma.admin.update({ where: { id: admin.id }, data: { accountActive: false } })
                     
-            const payload = { id: admin.id, role: admin.role }
+            const payload = { id: admin.id, role: admin.role, newEmail: email,  }
             const token = sign(payload, process.env.KEY_JWT!, { expiresIn: '1h' })
             const link = `${process.env.PUBLIC_URL}verify/admin/${token}`;
     
@@ -140,7 +140,7 @@ export class AdminController {
                 html
             })
 
-            serverResponse(res, 200, 'ok', 'Email has been updated!')
+            serverResponse(res, 200, 'ok', 'Verification email has been sent!')
         } catch (error: any) {
             serverResponse(res, 400, 'error', error)
         }
@@ -170,6 +170,8 @@ export class AdminController {
 
     async updatePhoto(req: Request, res: Response) {
         try { 
+            console.log('updating admin photo')
+            console.log('adminId:',req.params.id)
             const admin = await prisma.admin.findFirst({ where : { id: req.params.id }})
             if (admin) {
                 await prisma.admin.update({ where: { id: admin.id }, data: { imgUrl: req.body.imgUrl  } })
