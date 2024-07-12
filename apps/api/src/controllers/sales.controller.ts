@@ -86,10 +86,7 @@ export class SalesController {
                     analytics
                 };
             }));
-
-            console.log(SalesList);
             
-
             const totalSales = await prisma.orderItem.aggregate({
                 where: {
                     warehouseId: warehouse ? warehouse.id : { not: undefined },

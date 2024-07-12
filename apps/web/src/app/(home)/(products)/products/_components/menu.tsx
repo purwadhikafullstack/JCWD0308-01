@@ -197,12 +197,8 @@ export const ProductMenu = ({product, setIndex, sizeSum}:ICarousel) => {
                     }}
                 />
                 <AddToCartButton variantId={colorID} color={color} quantity={qty} size={size} stock={stock}/>
-                {/* <Button className=' w-full gap-2' disabled={stock == 0 ? true : false}>
-                    ADD TO CART
-                    <PiShoppingCart className='text-xl'/>
-                </Button> */}
             </div>
-            <p className='text-xs text-gray-500'>Stock: {stock}</p>
+            <p className={`text-xs ${stock == 0 ? 'text-red-500' : 'text-gray-500'} `}>{stock == 0 ? 'Out of stock' : `Stock: ${stock}`}</p>
             <Separator className="my-3"/>
             <div className='flex items-center gap-2'>
                 <WishlistLikedBtn func={handleCreateWishlist} isLiked={isLiked}/>

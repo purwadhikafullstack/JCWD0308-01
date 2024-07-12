@@ -84,7 +84,7 @@ export async function getOrderById(orderId: string) {
 export const getProvinces = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API_URL}address/getProvinces`, {
         method: 'GET',
-        cache: 'force-cache'
+        next: {revalidate: 1}
     });
     const result = await response.json()
     return result
