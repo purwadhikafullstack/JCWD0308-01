@@ -17,7 +17,6 @@ import Cookies from 'js-cookie';
 interface ICarousel {
     product:IProduct
     setIndex: React.Dispatch<React.SetStateAction<number>>
-    index: number
     sizeSum: ISizeSum[]
 }
 
@@ -29,7 +28,7 @@ export interface IWishlist {
 }
   
 
-export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
+export const ProductMenu = ({product, setIndex, sizeSum}:ICarousel) => {
     const sizeOrder = ["S", "M", "L", "XL"];
     const [colorID, setColorID] = useState(product.variants[0].id)
     const [color, setColor] = useState(product.variants[0].color)
@@ -168,7 +167,8 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
                     ${item._sum.stock == 0 ? 'bg-gray-200 text-gray-400 border-gray-400' : ''} 
                     ${size == item.size ? 'border-[2px] font-semibold' : ''} 
                     border-[1px] border-black flex justify-center items-center`} 
-                    onClick={() => setSize(item.size)}>
+                    onClick={() => setSize(item.size)}
+                    >
                         {item.size}
                     </button>
                 );
@@ -197,12 +197,8 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
                     }}
                 />
                 <AddToCartButton variantId={colorID} color={color} quantity={qty} size={size} stock={stock}/>
-                {/* <Button className=' w-full gap-2' disabled={stock == 0 ? true : false}>
-                    ADD TO CART
-                    <PiShoppingCart className='text-xl'/>
-                </Button> */}
             </div>
-            <p className='text-xs text-gray-500'>Stock: {stock}</p>
+            <p className={`text-xs ${stock == 0 ? 'text-red-500' : 'text-gray-500'} `}>{stock == 0 ? 'Out of stock' : `Stock: ${stock}`}</p>
             <Separator className="my-3"/>
             <div className='flex items-center gap-2'>
                 <WishlistLikedBtn func={handleCreateWishlist} isLiked={isLiked}/>

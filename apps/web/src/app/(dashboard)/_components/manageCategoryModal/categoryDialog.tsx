@@ -8,15 +8,16 @@ import {
 } from "@/components/ui/dialog"
 import { PiArrowSquareOut } from "react-icons/pi"
 import { ManageCategoryList } from "./categoryTypeList";
+import { Button } from "@/components/ui/button";
 
 export function ManageCategoryDialog({isSuper, setOpenC, openC }:{isSuper:boolean, setOpenC:React.Dispatch<React.SetStateAction<boolean>>, openC:boolean}) {
   return (
     <Dialog open={openC} onOpenChange={setOpenC}>
       <DialogTrigger asChild>
-        <div className={`flex items-center gap-1 border-b-2 max-sm:text-xs max-sm:border-b-[1px] border-b-black hover:bg-gray-100 hover:cursor-pointer`}>
-            <p>{isSuper ?"Manage" : 'See list'}</p>
-            <PiArrowSquareOut />
-        </div>
+        <Button className={`${isSuper ? '' : 'hidden'} h-7 items-center gap-1 max-sm:text-xs hover:cursor-pointer`}>
+            <p>Manage</p>
+            <PiArrowSquareOut />      
+        </Button>
       </DialogTrigger>
       <DialogContent className="h-full max-sm:min-w-full sm:h-[700px] gap-0">
         

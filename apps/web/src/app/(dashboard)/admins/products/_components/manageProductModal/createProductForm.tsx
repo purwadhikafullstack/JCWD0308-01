@@ -77,6 +77,8 @@ export function CreateProductForm({setOpen}:{setOpen:React.Dispatch<React.SetSta
         if (isInvalid) {
           toast.error("Product data is incomplete.")
         } else {   
+            const loadingToast = toast.loading('Creating products, please wait.')
+            loadingToast
             let thumbnailURL = await uploadFile(thumbnail!, 'thumbnail')
             let additionalURL = []
             let colorVariant = []
@@ -94,11 +96,12 @@ export function CreateProductForm({setOpen}:{setOpen:React.Dispatch<React.SetSta
             const data = {name, description, oneSize: isOneSize, price, colorVariant, additionalURL, thumbnailURL, categoryData:{gender, type, category}}
             const res = await createProduct(data)
             if (res.status == 'ok') {
+              toast.dismiss(loadingToast)
               setOpen(false)
               toast.success("product successfully created")
             } else if (res.status =='error') {
-              toast.error(res.message)
-              console.log(res.message);
+                toast.dismiss(loadingToast)
+                typeof(res.message) == 'string' ? toast.error(res.message) : toast.error('Failed to create product.')
             }
           }
       } catch (error) {

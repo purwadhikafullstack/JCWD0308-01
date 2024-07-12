@@ -30,7 +30,7 @@ interface IStockTable {
             <TableRow>
               <TableHead className="w-[50px]">No.</TableHead>
               <TableHead className="">Product Name</TableHead>
-              <TableHead className="">Product ID</TableHead>
+              {/* <TableHead className="">Product ID</TableHead> */}
               <TableHead className="text-center">Gender</TableHead>
               <TableHead className="text-center max-w-52">Type</TableHead>
               <TableHead className="text-center">Category</TableHead>
@@ -54,12 +54,16 @@ interface IStockTable {
               <TableRow key={item.id}>
                 <TableCell>{(index + 1) + ((page - 1) * 10)}</TableCell>
                 <TableCell className="font-semibold">{item.name}</TableCell>
-                <TableCell className="">{item.id}</TableCell>
+                {/* <TableCell className="">{item.id}</TableCell> */}
                 <TableCell className="text-center">{item.category.gender.at(0) + item.category.gender.slice(1).toLowerCase()}</TableCell>
                 <TableCell className="text-center">{item.category.type.at(0) + item.category.type.slice(1).toLowerCase()}</TableCell>
                 <TableCell className="text-center">{item.category.category}</TableCell>
                 <TableCell className={`text-center ${item.stockUpdatedAt? "hidden" : "block"}`}>no data</TableCell>
-                <TableCell className={`flex-wrap items-center justify-center gap-x-1 ${item.stockUpdatedAt? "flex" : "hidden"}`}><p>{date?.date} {date?.month} {date?.year},</p><p>{date?.hours.toString().padStart(2, '0')}.{date?.minute.toString().padStart(2, '0')} WIB</p></TableCell>
+                <TableCell className={`${item.stockUpdatedAt? "" : "hidden"}`}>
+                  <div className={`flex-wrap items-center justify-center gap-x-1 flex`}>
+                    <p>{date?.date} {date?.month} {date?.year},</p><p>{date?.hours.toString().padStart(2, '0')}.{date?.minute.toString().padStart(2, '0')} WIB</p>
+                  </div>
+                </TableCell>
                 <TableCell className="text-center text-green-500">{item.stockIn._sum.quantity? '+': ''}{item.stockIn._sum.quantity}</TableCell>
                 <TableCell className="text-center text-red-500">{item.stockOut._sum.quantity? '-': ''}{item.stockOut._sum.quantity}</TableCell>
                 <TableCell className="text-center">{item.toDateStock}</TableCell>
@@ -81,6 +85,7 @@ interface IStockTable {
           </TableBody>
         </Table>
         <PaginationTemplate
+        limiter={10}
         setPage={setPage}
         page={page}
         productQty={productQty}

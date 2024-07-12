@@ -17,6 +17,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import ExcelButton from '@/app/(dashboard)/_components/excelButton'
 import { downloadProductsToExcel } from '@/lib/xlsx'
 import Image from 'next/image'
+import { toast } from 'sonner'
 
 const monthFirstDate = () => {
   const now = new Date();
@@ -25,7 +26,7 @@ const monthFirstDate = () => {
 
 
 export  function Products() {
-const [selectedWH, setSelectedWH] = useState('All Warehouses')
+const [selectedWH, setSelectedWH] = useState('')
 const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
 const [productList, setProductList] = useState<IProduct[]>([])
 const [open, setOpen] = useState(false);
@@ -50,20 +51,11 @@ const debounced = useDebouncedCallback(
     500
 )
 
-const getAdmWH = async() => {
-  const admin = await getAdminClientSide()
-  const warehouse = await getWarehouse(admin.id)
-  setWarehouseList(warehouse)
-  if (admin.role == 'warAdm') {
-    setSelectedWH(warehouse[0].warehouseName)
-  } else if (admin.role == 'superAdm') {
-    setSelectedWH('All Warehouses')
-    setIsSuper(true)
-  }
-}
+
 
 const getData = useCallback(async () => {
-  if (date?.from && date?.to && selectedWH) {
+  if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
+    window.scrollTo(0, 0);
     const g = gender === "All" ? '' : gender;
     const t = type === "All" ? '' : type;
     const c = category === "All" ? '' : category;
@@ -87,6 +79,25 @@ const getData = useCallback(async () => {
 }, [date, selectedWH, gender, type, category, page, q]);
 
 useEffect(() => {
+  const getAdmWH = async() => {
+    try {
+      const admin = await getAdminClientSide()
+      const warehouse = await getWarehouse(admin.id)
+      setWarehouseList(warehouse)
+      if (admin.role == 'warAdm') {
+        if (!warehouse || warehouse.length == 0) {
+          setSelectedWH('Not Assigned')
+          throw 'You are not assigned to any warehouse.'
+        }
+        setSelectedWH(warehouse[0].warehouseName)
+      } else if (admin.role == 'superAdm') {
+        setSelectedWH('All Warehouses')
+        setIsSuper(true)
+      }
+    } catch (error:any) {
+      typeof(error) == 'string' ? toast.error(error) : toast.error('Failed to get data.')
+    }
+  }
   getAdmWH();
 }, []);
 
@@ -111,13 +122,13 @@ useEffect(() => {
             modalElement={<ManageCategoryDialog isSuper={isSuper} setOpenC={setOpenC} openC={openC} />}
           />
         </div>
-        <div className='flex flex-col mb-7 w-full items-start lg:items-end z-10'>
-            {/* <p className='text-xs md:text-xl bg-white/80 mb-2 px-2'>Warehouse</p> */}
+        <div className='flex flex-col mb-7 w-fit lg:w-full items-start lg:items-end z-10'>
+            {/* <p className='text-sm md:text-xl bg-white/80 mb-2 px-2  max-md:font-semibold'>Warehouse</p> */}
             <WarehouseDropdown 
-                selectedWH={selectedWH}
-                setSelectedWH={setSelectedWH}
-                warehouseList={warehouseList}
-                isSuper={isSuper}
+              isSuper={isSuper}
+              warehouseList={[...warehouseList]}
+              setSelectedWH={setSelectedWH}
+              selectedWH={selectedWH}
             />
         </div>
         <div className='absolute inset-0 overflow-x-hidden'>
@@ -133,7 +144,9 @@ useEffect(() => {
 
       <div className='p-4 sm:p-8 lg:px-10 lg:py-6'>  
         <div className='flex w-full items-center max-sm:gap-2 gap-4 flex-wrap gap-y-5 justify-between'>
-          <ExcelButton func={() => downloadProductsToExcel(productList, selectedWH)}/>
+          <div className={selectedWH !== 'Not Assigned' ? "" : 'hidden'}>
+            <ExcelButton func={() => downloadProductsToExcel(productList, selectedWH)}/>
+          </div>
 
           <div className='flex flex-1 gap-2 max-sm:justify-between justify-end items-center'>
             <Input id='search' type="text" placeholder="Search products" className='w-full sm:max-w-60 min-w-44' onChange={(e) => debounced(e.target.value)}/>

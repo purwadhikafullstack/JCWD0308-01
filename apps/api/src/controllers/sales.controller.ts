@@ -86,10 +86,7 @@ export class SalesController {
                     analytics
                 };
             }));
-
-            console.log(SalesList);
             
-
             const totalSales = await prisma.orderItem.aggregate({
                 where: {
                     warehouseId: warehouse ? warehouse.id : { not: undefined },
@@ -141,7 +138,15 @@ export class SalesController {
         let size = s == 'One Size' ? 'ONESIZE' : String(s).toUpperCase() 
         
         try {
-            let warehouse = await prisma.warehouse.findFirst({
+            const validSlug = await prisma.product.findFirst({
+                where: {
+                    slug
+                }
+            })
+
+            if (!validSlug) throw 'No product found.'
+
+            const warehouse = await prisma.warehouse.findFirst({
                 where: {
                     warehouseName: String(w)
                 }

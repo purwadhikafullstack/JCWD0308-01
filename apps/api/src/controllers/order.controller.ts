@@ -233,7 +233,7 @@ export class OrderController {
                         attachments: [{ path: pdf }]
                     })
                 }
-            } else if (req.body.transaction_status === 'failed' || 'expire') {
+            } else if (req.body.transaction_status === 'failed') {
                 await failedOrder(req.body.order_id);
             } else {
                 return

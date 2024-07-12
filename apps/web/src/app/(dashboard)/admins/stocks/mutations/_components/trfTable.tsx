@@ -46,11 +46,13 @@ export function TransferTable({selectedWH, open, setOpen, getQty}:IHistoryTable)
 
   const handleAccept = async (id:string) => {
     const res = await acceptRequest(id)
+    console.log(res);
+    
     if (res.status == 'ok') {
       toast.success('Stock successfully transfered.')
       getQty()
       getData()
-    } else if (res.message == 'Stock at warehouse is lower than requested ammount.') {
+    } else if (res.message == 'Stock at warehouse is lower than requested amount.') {
       toast.error(res.message)
     } else {
       toast.error('Failed to transfer stock.')
@@ -70,7 +72,7 @@ export function TransferTable({selectedWH, open, setOpen, getQty}:IHistoryTable)
 
 
   return (
-      <div className="my-2">
+      <div className="">
       <Table className="min-w-[300px]">
         <TableHeader>
           <TableRow className="bg-secondary">
@@ -124,7 +126,7 @@ export function TransferTable({selectedWH, open, setOpen, getQty}:IHistoryTable)
           }
         </TableBody>
       </Table>
-      <PaginationTemplate page={page} productQty={productQty} setPage={setPage}/>
+      <PaginationTemplate page={page} productQty={productQty} setPage={setPage} limiter={5}/>
     </div>
   )
 }

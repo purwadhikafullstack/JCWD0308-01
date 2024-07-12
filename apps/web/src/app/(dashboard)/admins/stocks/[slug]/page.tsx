@@ -3,20 +3,20 @@ import { WarehouseDropdown } from "@/app/(dashboard)/_components/warehouseDropdo
 import { getProductSlug, getStockDetail, getWarehouse } from "@/app/action";
 import { IProduct, IStockMutationItem, IWarehouse } from "@/constants";
 import { getAdminClientSide } from "@/lib/utils";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PiCaretCircleLeft, PiFileArrowDownFill } from "react-icons/pi";
 import { DatePickerWithRange } from "../_components/datePicker";
-import { Input } from "@/components/ui/input";
 import { StockDetailTable } from "../_components/stockDetailTable";
 import { Selector } from "../../../../../components/selector";
 import { Table,TableBody,TableCell, TableHead,TableHeader, TableRow} from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator";
 import ExcelButton from "@/app/(dashboard)/_components/excelButton";
 import { downloadStockDetailsToExcel } from "@/lib/xlsx";
+import { toast } from "sonner";
 
 const monthFirstDate = () => {
     const now = new Date();
@@ -26,7 +26,7 @@ const monthFirstDate = () => {
 export default function Page() {
     const {slug} = useParams()
     const typeArr = ['All','Restock', 'Remove', 'Transfer', 'Inbound', 'Delete', 'Transaction']
-    const [selectedWH, setSelectedWH] = useState('All Warehouses')
+    const [selectedWH, setSelectedWH] = useState('')
     const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
     const [StockList, setStockList] = useState<IStockMutationItem[]>([])
     const [productData, setProductData] = useState<IProduct>()
@@ -36,52 +36,64 @@ export default function Page() {
     const [isSuper, setIsSuper] = useState(false)
     const [variants, setVariants] = useState('All')
     const [size, setSize] = useState('All')
+    const router = useRouter()
     const [date, setDate] = useState<DateRange | undefined>({
       from: monthFirstDate(),
       to: new Date(),
     })
   
-    const getAdmWH = async() => {
-      const admin = await getAdminClientSide()
-      const warehouse = await getWarehouse(admin.id)
-      setWarehouseList(warehouse)
-      if (admin.role == 'warAdm') {
-        setSelectedWH(warehouse[0].warehouseName)
-      } else if (admin.role == 'superAdm') {
-        setIsSuper(true)
+    useEffect(() => {
+      const getAdmWH = async() => {
+        try {
+          const admin = await getAdminClientSide()
+          const warehouse = await getWarehouse(admin.id)
+          setWarehouseList(warehouse)
+          if (admin.role == 'warAdm') {
+            if (!warehouse || warehouse.length == 0) {
+              setSelectedWH('Not Assigned')
+              throw 'You are not assigned to any warehouse.'
+            }
+            setSelectedWH(warehouse[0].warehouseName)
+          } else if (admin.role == 'superAdm') {
+            setSelectedWH('All Warehouses')
+            setIsSuper(true)
+          }
+        } catch (error:any) {
+          typeof(error) == 'string' ? toast.error(error) : toast.error('Failed to get data.')
+        }
       }
-    }
+      getAdmWH();
+    }, []);
   
-    const getData = async() => {
-      if (date && selectedWH) {
-        const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
-        const v = variants == 'All' ? '' : variants 
-        const s = size == 'All' ? '' : size 
-        const t = type == 'All' ? '' : type 
-        const filter = {date, t, v, s}
-        const res = await getStockDetail(String(slug), warehouse, page, 10, filter)
-        const prod = await getProductSlug(String(slug), warehouse, '')
-        if (res.status == 'ok' && prod.status == 'ok') {
+    useEffect(() => {
+      const getData = async() => {
+        if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
+          try {
+            window.scrollTo(0, 0);
+            const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
+            const v = variants == 'All' ? '' : variants 
+            const s = size == 'All' ? '' : size 
+            const t = type == 'All' ? '' : type 
+            const filter = {date, t, v, s}
+            const res = await getStockDetail(String(slug), warehouse, page, 10, filter)
+            if (res.status == 'error') throw res.message
+            const prod = await getProductSlug(String(slug), warehouse, '')
             setStockList(res.stockList)
             setProductQty(res.totalData)
             setProductData(prod.productList)
+          } catch (error:any) {
+            typeof(error) == 'string' ? toast.error(error) : 'Failed to get stock data.'
+            router.push('/admins/stocks')
+          }
         }
       }
-    }
-    
-  
-    useEffect(() => {
-      getAdmWH()
-    }, [])
-  
-    useEffect(() => {
       getData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedWH, type, page, date, size, variants])
     
     return (
       <div className="flex flex-col w-full min-h-screen">  
-        <div className='flex mb-7 w-full items-center max-sm:flex-col gap-y-7'>
+       <div className='flex gap-5 mb-7 lg:mb-14 md:gap-10 max-md:flex-wrap z-10'>
             <div className='w-full flex items-center text-black/60 gap-0 max-lg:hidden'>
             <Button variant={'ghost'} className='w-5 max-sm:h-5 sm:w-10 p-0'>
                 <Link href={'/admins/stocks/'} >
@@ -90,7 +102,7 @@ export default function Page() {
             </Button>
             <h1 className='text-xl xl:text-2xl font-medium'>Product Stock Details</h1>
             </div>
-            <div className='flex flex-col w-full items-start lg:items-end'>
+            <div className='flex flex-col w-fit lg:w-full items-start lg:items-end z-10'>
                 {/* <p className='text-xl'>Warehouse</p> */}
                 <WarehouseDropdown 
                     selectedWH={selectedWH}

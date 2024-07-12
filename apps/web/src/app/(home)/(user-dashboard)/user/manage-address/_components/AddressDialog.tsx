@@ -26,6 +26,9 @@ export function AddressDialog({ children, btnText, editAddress, id }: { children
     const fetchProvinces = async () => {
         try {
             const data = await getProvinces();
+            console.log(data);
+            console.log('test');
+            
             setProvinces(data.rajaongkir.results);
         } catch (err) {
             console.log(err);

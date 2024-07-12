@@ -99,6 +99,9 @@ export class ProductController {
                             }
                         }
                     },
+                    orderBy: {
+                        updatedAt: 'desc'
+                    },
                     take: +limit, 
                     skip: (+p! - 1) * +limit
                 })
@@ -281,6 +284,8 @@ export class ProductController {
                                 category: true
                             }
                         })
+
+                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -330,6 +335,7 @@ export class ProductController {
                                 category: true
                             }
                         })
+                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -359,6 +365,9 @@ export class ProductController {
                             },
 
                         })
+                        
+                        console.log(sizeSum);
+                        
                         
                         return res.status(200).send({
                             status: 'ok',
@@ -403,6 +412,7 @@ export class ProductController {
                                 category: true
                             }
                         })
+                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -455,6 +465,7 @@ export class ProductController {
                                 category: true
                             }
                         })
+                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({

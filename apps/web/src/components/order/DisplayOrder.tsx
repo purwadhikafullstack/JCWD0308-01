@@ -35,20 +35,22 @@ export default function DisplayOrder({ warehouse }: DisplayOrderProps) {
     const router = useRouter()
 
     const warehouseData = useCallback(async (warehouse: string) => {
-        let newUrl = ''
-        if (warehouse && warehouse !== 'All Warehouses') {
-            newUrl = formUrlQuery({
-                params: search.toString(),
-                key: 'w',
-                value: warehouse
-            })
-        } else {
-            newUrl = removeKeysFromQuery({
-                params: search.toString(),
-                keysToRemove: ['w']
-            })
+        if (warehouse !== 'Not Assigned' && warehouse !== '') {
+            let newUrl = ''
+            if (warehouse && warehouse !== 'All Warehouses') {
+                newUrl = formUrlQuery({
+                    params: search.toString(),
+                    key: 'w',
+                    value: warehouse
+                })
+            } else {
+                newUrl = removeKeysFromQuery({
+                    params: search.toString(),
+                    keysToRemove: ['w']
+                })
+            }
+            router.push(newUrl, { scroll: false });
         }
-        router.push(newUrl, { scroll: false });
     }, [router, search])
 
     useEffect(() => {

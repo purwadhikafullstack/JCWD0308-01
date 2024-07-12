@@ -1,5 +1,5 @@
 'use client'
-import { getAllStock, getWarehouse } from '@/app/action'
+import { getAllStock, getMutationRequest, getWarehouse } from '@/app/action'
 import { StockDialog } from '@/app/(dashboard)/admins/stocks/_components/stocksDialog'
 import { StockTable } from '@/app/(dashboard)/admins/stocks/_components/stocksTable'
 import { StatisticsCard } from '@/app/(dashboard)/_components/statisticsCard'
@@ -20,6 +20,7 @@ import xlsx, { IContent, IJsonSheet } from "json-as-xlsx";
 import { downloadStockToExcel } from '@/lib/xlsx'
 import ExcelButton from '@/app/(dashboard)/_components/excelButton'
 import Image from 'next/image'
+import { toast } from 'sonner'
 
 const monthFirstDate = () => {
   const now = new Date();
@@ -27,7 +28,7 @@ const monthFirstDate = () => {
 }
 
 export const Stocks = () => {  
-  const [selectedWH, setSelectedWH] = useState('All Warehouses')
+  const [selectedWH, setSelectedWH] = useState('')
   const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
   const [productList, setProductList] = useState<IProduct[]>([])
   const [inventory, setInventory] = useState(0)
@@ -39,6 +40,7 @@ export const Stocks = () => {
   const [type, setType] = useState('All')
   const [category, setCategory] = useState('All')
   const [q, setQ] = useState('')
+  const [notif, setNotif] = useState(0)
   const [date, setDate] = useState<DateRange | undefined>({
     from: monthFirstDate(),
     to: new Date(),
@@ -51,19 +53,9 @@ export const Stocks = () => {
       500
   )
 
-  const getAdmWH = async() => {
-    const admin = await getAdminClientSide()
-    const warehouse = await getWarehouse(admin.id)
-    setWarehouseList(warehouse)
-    if (admin.role == 'warAdm') {
-      setSelectedWH(warehouse[0].warehouseName)
-    } else if (admin.role == 'superAdm') {
-      setIsSuper(true)
-    }
-  }
-
   const getData = async() => {
-    if (date?.from && date?.to && selectedWH) {
+    if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
+      window.scrollTo(0, 0);
       const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
       const g = gender == "All" ? '' : gender
       const t = type == "All" ? '' : type
@@ -80,7 +72,38 @@ export const Stocks = () => {
     }
   }
 
+  useEffect(()=> {
+    if (selectedWH !== 'All Warehouses' && selectedWH !== 'Not Assigned') {
+        const getQty = async() => {
+          const res = await getMutationRequest(selectedWH, 'waiting', 1, 1000);
+          if (res.status === 'ok') {
+            setNotif(res.data.total);
+          }
+        }
+      getQty()
+    }
+  }, [selectedWH])
+
   useEffect(() => {
+    const getAdmWH = async() => {
+      try {
+        const admin = await getAdminClientSide()
+        const warehouse = await getWarehouse(admin.id)
+        setWarehouseList(warehouse)
+        if (admin.role == 'warAdm') {
+          if (!warehouse || warehouse.length == 0) {
+            setSelectedWH('Not Assigned')
+            throw 'You are not assigned to any warehouse.'
+          }
+          setSelectedWH(warehouse[0].warehouseName)
+        } else if (admin.role == 'superAdm') {
+          setSelectedWH('All Warehouses')
+          setIsSuper(true)
+        }
+      } catch (error:any) {
+        typeof(error) == 'string' ? toast.error(error) : toast.error('Failed to get data.')
+      }
+    }
     getAdmWH()
   }, [])
 
@@ -98,7 +121,7 @@ export const Stocks = () => {
             number={inventory ? inventory : 0}
           />
         </div>
-        <div className='flex flex-col mb-7 w-full items-start lg:items-end z-10'>
+        <div className='flex flex-col mb-7 w-fit lg:w-full items-start lg:items-end z-10'>
             {/* <p className='text-sm md:text-xl bg-white/80 mb-2 px-2  max-md:font-semibold'>Warehouse</p> */}
             <WarehouseDropdown 
               isSuper={isSuper}
@@ -122,7 +145,7 @@ export const Stocks = () => {
 
         <div className='flex items-center w-full gap-4 flex-wrap gap-y-5 justify-between'>
           <div className='flex gap-2 max-sm:justify-center max-sm:flex-wrap sm:flex-1 max-sm:w-full'>
-            <div className={`${productList ? "" : 'hidden'}`}>
+            <div className={`${productList && selectedWH !== 'Not Assigned' ? "" : 'hidden'}`}>
               <StockDialog 
                 selectedWH={selectedWH} 
                 setSelectedWH={setSelectedWH} 
@@ -131,13 +154,18 @@ export const Stocks = () => {
                 open={open}
               />
             </div>
-            <Link href={'/admins/stocks/mutations'} className={productList.length > 0 ? isSuper? 'hidden' : '' : 'hidden'}>
-              <Button variant={'outline'} className='flex items-center gap-1 max-sm:text-xs'>
+            <Link href={'/admins/stocks/mutations'} className={productList.length == 0 || isSuper? 'hidden' : 'relative'}>
+              <Button variant={'outline'} className='flex items-center gap-1 max-sm:text-xs '>
                 <p className='sm:hidden'>Mutation</p>
                 <p className='max-sm:hidden'>Manage Mutation</p>
               <PiArrowSquareOut className="text-xl"/> </Button>
+              <div className={`absolute -top-2 -right-1 text-[0.6rem] text-white bg-red-500 rounded-full min-w-5 h-5 items-center justify-center ${notif > 0 && !isSuper ? 'flex' : 'hidden'}`}>
+                {notif > 10 ? '10+' : notif}
+              </div>
             </Link>
-            <ExcelButton func={() => downloadStockToExcel(productList, selectedWH)} />
+            <div className={selectedWH !== 'Not Assigned' ? "" : 'hidden'}>
+              <ExcelButton func={() => downloadStockToExcel(productList, selectedWH)} />
+            </div>
 
           </div>
 

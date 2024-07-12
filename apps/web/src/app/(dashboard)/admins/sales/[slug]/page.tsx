@@ -16,6 +16,8 @@ import { SalesDetailTable } from '../_components/salesDetailTable'
 import { Selector } from '@/components/selector'
 import ExcelButton from '@/app/(dashboard)/_components/excelButton'
 import { downloadSalesDetailsToExcel } from '@/lib/xlsx'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 const monthFirstDate = () => {
   const now = new Date();
@@ -38,6 +40,7 @@ export default function SalesDetail () {
   const [isSuper, setIsSuper] = useState(false)
   const [variants, setVariants] = useState('All')
   const [size, setSize] = useState('All')
+  const router = useRouter()
   const [date, setDate] = useState<DateRange | undefined>({
     from: monthFirstDate(),
     to: new Date(),
@@ -56,19 +59,24 @@ export default function SalesDetail () {
 
   const getData = async() => {
     if (date?.from && date?.to && selectedWH) {
-      const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
-      const v = variants == 'All' ? '' : variants 
-      const s = size == 'All' ? '' : size 
-      const filter = {date, v, s}
-      const res = await getSalesDetail(String(slug), warehouse, page, 10, filter)
-      const prod = await getProductSlug(String(slug), warehouse, '')
-      if (res.status == 'ok'&& prod.status == 'ok') {
-          setProductQty(res.totalGross._count)
-          setProdName(prod.productList.name)
-          setProductData(prod.productList)
-          setSalesData(res.productSales)
-          setGross(res.totalGross._sum.price)
-          setSold(res.totalGross._sum.quantity)
+      try {
+        window.scrollTo(0, 0);
+        const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
+        const v = variants == 'All' ? '' : variants 
+        const s = size == 'All' ? '' : size 
+        const filter = {date, v, s}
+        const res = await getSalesDetail(String(slug), warehouse, page, 10, filter)
+        if (res.status == 'error') throw res.message
+        const prod = await getProductSlug(String(slug), warehouse, '')
+        setProductQty(res.totalGross._count)
+        setProdName(prod.productList.name)
+        setProductData(prod.productList)
+        setSalesData(res.productSales)
+        setGross(res.totalGross._sum.price)
+        setSold(res.totalGross._sum.quantity)
+      } catch (error) {
+        typeof(error) == 'string' ? toast.error(error) : 'Failed to get sales data.'
+        router.push('/admins/sales')
       }
     }
   }
@@ -94,7 +102,7 @@ export default function SalesDetail () {
           </Button>
           <h1 className='text-xl xl:text-2xl font-medium'>Product Sales Details</h1>
         </div>
-        <div className='flex flex-col w-full items-start lg:items-end'>
+        <div className='flex flex-col mb-7 w-fit lg:w-full items-start lg:items-end z-10'>
           <WarehouseDropdown 
               selectedWH={selectedWH}
               setSelectedWH={setSelectedWH}

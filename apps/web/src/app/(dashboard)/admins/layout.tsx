@@ -29,7 +29,7 @@ export default function Layout({children}: Readonly<{children: React.ReactNode}>
           <body className={poppins.className}>
             <AdminDashboard>
                 <Suspense fallback={<Loading/>}>
-                    <Toaster position="top-center" expand={true} richColors/>
+                    <Toaster position="top-center" richColors/>
                     {children}
                 </Suspense>
             </AdminDashboard>

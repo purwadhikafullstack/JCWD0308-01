@@ -1,7 +1,7 @@
 'use client'
 
 import { WarehouseDropdown } from '@/app/(dashboard)/_components/warehouseDropdown'
-import { getWarehouse } from '@/app/action'
+import { getMutationRequest, getWarehouse } from '@/app/action'
 import { IWarehouse } from '@/constants'
 import { getAdminClientSide } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -18,6 +18,9 @@ export default function Mutation() {
   const [selectedWH, setSelectedWH] = useState('')
   const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
   const [isSuper, setIsSuper] = useState(false)
+
+
+
   
   
   const getAdmWH = async() => {
@@ -42,19 +45,19 @@ export default function Mutation() {
 
 
   return (
-    <div className=''>
+    <div className='p-4 sm:p-8 lg:px-10 lg:py-6'>
       
-      <div className='flex w-full mb-7 items-center max-sm:flex-col gap-y-7'>
-        <div className='w-full flex items-center gap-0'>
+      <div className='flex gap-5 mb-7 lg:mb-14 md:gap-10 max-md:flex-wrap z-10'>
+        <div className='w-full flex items-center text-black/60 gap-0 max-lg:hidden'>
           <Button variant={'ghost'} className='w-5 max-sm:h-5 sm:w-10 p-0'>
             <Link href={'/admins/stocks/'} >
               <PiCaretCircleLeft className='text-xs sm:text-3xl'/>
             </Link>
           </Button>
-          <h1 className='text-xl sm:text-4xl font-medium'>Manage Mutations</h1>
+          <h1 className='text-xl sm:text-2xl font-medium'>Manage Mutations</h1>
         </div>
-        <div className='flex flex-col w-full items-end mb-7'>
-            <p className='text-xl'>Warehouse</p>
+        <div className='flex flex-col w-fit lg:w-full items-start lg:items-end z-10'>
+            {/* <p className='text-xl'>Warehouse</p> */}
             <WarehouseDropdown 
                 selectedWH={selectedWH}
                 setSelectedWH={setSelectedWH}

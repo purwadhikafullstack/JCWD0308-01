@@ -17,7 +17,7 @@ interface IProductCard {
 export const ProductCard = ({slug, totalStock, thumbnailURL, gender, oneSize, variants, name, price}:IProductCard) => {
   return (
     <Link 
-    className='w-40 h-[280px] sm:w-60 sm:h-[25rem] hover:cursor-pointer items flex flex-col bg-white rounded-md drop-shadow-[0_5px_5px_rgba(0,0,0,0.05)]' 
+    className='w-40 h-[280px] sm:w-60 sm:h-[25rem] hover:cursor-pointer items flex flex-col bg-white rounded-md drop-shadow-[0_5px_5px_rgba(0,0,0,0.05)] select-none' 
     href={`/products/${slug}`} 
     >
         <Image 

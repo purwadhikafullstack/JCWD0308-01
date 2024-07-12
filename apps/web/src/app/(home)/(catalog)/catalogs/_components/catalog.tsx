@@ -17,16 +17,18 @@ export const Catalogs = () => {
   const [page, setPage] = useState(1)
   const [productList, setProductList] = useState<IProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const limiter = 9
 
   useEffect(() => {
     const getData = async(p: number) => {
+      window.scrollTo(0, 0);
       setIsLoading(true)
       const gender = params.get('g')
       const type = params.get('t')
       const category = params.get('c')
       const q = params.get('q')
       let s = sort.toLowerCase().replaceAll(' ', '-')
-      const product = await getCatalog(gender || '', type || '', category || '', q || '',  s,  String(p), '9')
+      const product = await getCatalog(gender || '', type || '', category || '', q || '',  s,  String(p), String(limiter))
       if (product.status == 'ok') {
         setProductQty(product.totalProduct)
         setProductList(product.productList)
@@ -36,8 +38,11 @@ export const Catalogs = () => {
     getData(page)
   }, [params, page, sort])
 
+  console.log(productQty);
+  
+
   return (
-    <div className={`w-full flex flex-col justify-between min-w-[332px] sm:min-w-[520px] xl:min-w-[800px] ${productQty == 0 && !isLoading ? 'h-[100vh]' : 'xl:h-[1510px]'}`}>
+    <div className={`w-full flex flex-col justify-between min-w-[332px] sm:min-w-[520px] xl:min-w-[800px] ${productQty == 0 && !isLoading ? 'h-[100vh]' : 'min-h-[50vh]'}`}>
       <div>
         <div className="flex justify-between mb-10 lg:px-5 xl:px-3">
           <div>
@@ -49,7 +54,7 @@ export const Catalogs = () => {
               <p className='text-right mb-1'>Sort by:</p>
               <Selector 
               label="Sort by"
-              state={['Newest', 'Low to high', 'High to low', 'A-Z', 'Most Purchased']}
+              state={['Newest', 'Low to high', 'High to low', 'A-Z']}
               setState={setSort}
               defValue={sort}
               />
@@ -87,6 +92,7 @@ export const Catalogs = () => {
 
       <div className={`py-10 ${productQty == 0? 'hidden' : ''}`}>
         <PaginationTemplate
+        limiter={limiter}
         productQty={productQty}
         page={page}
         setPage={setPage}

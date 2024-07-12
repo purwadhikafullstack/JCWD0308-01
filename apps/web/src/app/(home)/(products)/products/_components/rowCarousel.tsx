@@ -20,7 +20,6 @@ interface IRowCarousel {
 
 
 export function RowCarousel({product, index, setIndex}:IRowCarousel) {
-    console.log(product.images);
     
 
     const [api, setApi] = React.useState<CarouselApi>()
