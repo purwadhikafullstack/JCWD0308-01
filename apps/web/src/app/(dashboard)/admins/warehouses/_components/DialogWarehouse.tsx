@@ -17,8 +17,8 @@ import { IWarehouse } from "./columns"
 
 export function DialogWarehouse({ btnText, editWarehouse, editDialog, setEditDialog, optionalCancleFunc, warehouseData, editFunc }
 : { btnText: string, editWarehouse: boolean, editDialog?: any, setEditDialog?:any, optionalCancleFunc?: any, warehouseData?: IWarehouse, editFunc?: any }) {
+    
     const [ isLoading, setIsLoading ] = useState(false);
-
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [cities, setCities] = useState<City[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<string>('');
@@ -39,7 +39,7 @@ export function DialogWarehouse({ btnText, editWarehouse, editDialog, setEditDia
             const data = await getProvinces();
             setProvinces(data.rajaongkir.results);
         } catch (err) {
-            console.log(err);
+            toast.error(err instanceof Error? err.message : "Error fetching provinces")
         }
     };
 
@@ -62,7 +62,7 @@ export function DialogWarehouse({ btnText, editWarehouse, editDialog, setEditDia
         }
 
         function errorCallback(error: any) {
-            console.log(error)
+            toast.error(error instanceof Error? error.message : "Error locating your coordinate")
         }
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
@@ -101,9 +101,11 @@ export function DialogWarehouse({ btnText, editWarehouse, editDialog, setEditDia
 
     useEffect(() => {
         if (warehouseData) {
+            setWarehouseNameValue(warehouseData.warehouseName.trim());
             if (warehouseData.warehouseName.trim().length > 6) {
-                setWarehouseNameValue(warehouseData.warehouseName);
-                setWarehouseNameCheck(false)
+                setWarehouseNameCheck(false);
+            } else {
+                setWarehouseNameCheck(true);
             }
             if (warehouseData.adminID) fetchAssignedAdmin();
         }
@@ -152,11 +154,21 @@ export function DialogWarehouse({ btnText, editWarehouse, editDialog, setEditDia
     }
 
     const handleWarehouseNameChange = () => {
+        const validNamePattern = /^[a-zA-Z0-9_\s-]+$/;
         if (warehouseNameRef.current){
-            if ((warehouseNameRef.current as HTMLInputElement).value.trim().length > 6) {
-                setWarehouseNameValue((warehouseNameRef.current as HTMLInputElement).value.trim())
-                setWarehouseNameCheck(false)
-            } else return setWarehouseNameCheck(true);
+            const inputValue = (warehouseNameRef.current as HTMLInputElement).value.trim();
+    
+            if (inputValue.length > 6 && validNamePattern.test(inputValue)) {
+                setWarehouseNameValue(inputValue);
+                setWarehouseNameCheck(false);
+            } else {
+                if (!validNamePattern.test(inputValue)) {
+                    toast.error('Warehouse Name cannot have any symbols except hypen ( - ) and underscore ( _ )')
+                } else {
+                    toast.error('Warehouse Name must be at least 7 characters')
+                }
+                setWarehouseNameCheck(true);
+            }
         }
     }
 
