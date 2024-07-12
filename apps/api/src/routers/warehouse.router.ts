@@ -21,10 +21,10 @@ export class WarehouseRouter {
         this.router.get('/:id', this.warehouseController.getWarehouseList)
         this.router.post('/', this.warehouseController.createWarehouse)
         this.router.post('/', this.warehouseController.createWarehouse)
-        this.router.patch('/:id', this.warehouseController.editWarehouse)
         this.router.patch('/assign-admin-to-warehouse', this.warehouseController.assignAdminToWarehouse)
         this.router.patch('/dismiss-admin-from-warehouse', this.warehouseController.dissmissAdminFromWarehouse)
         this.router.patch('/reactivate-warehouse/:id', this.warehouseController.reactivateWarehouse)
+        this.router.patch('/:id', this.warehouseController.editWarehouse)
         this.router.delete('/deactivate-warehouse/:id', this.warehouseController.deactivateWarehouse)
     }
 

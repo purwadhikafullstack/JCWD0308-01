@@ -13,16 +13,21 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Search } from "../../../components/search";
 import { ICategory, IProduct } from "@/constants"
+import { Spinner } from "@/components/ui/spinner"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { getRequest } from "@/lib/fetchRequests"
+import { IUser } from "../(user-dashboard)/user/edit-profile/_components/EditProfileForm"
   
-export function HeaderDropdown({ userLogged, router, menCategories, womenCategories }: { userLogged: boolean, router: AppRouterInstance, menCategories: ICategory[] | [], womenCategories: ICategory[] | [] }) {
-    
+export function HeaderDropdown({ userLogged, router, menCategories, womenCategories, wishlistItems }: { userLogged: boolean, router: AppRouterInstance, menCategories: ICategory[] | [], womenCategories: ICategory[] | [], wishlistItems: IProduct[] | [] | undefined }) {
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline"><PiList size={`20px`} /></Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 md:hidden">
-                <Search />
+                <div className="min-[550px]:hidden "><Search /></div>
                 <Link href={`/catalogs`}>
                     <DropdownMenuItem className="flex items-center justify-between">
                         <div className="flex gap-2">
@@ -50,7 +55,10 @@ export function HeaderDropdown({ userLogged, router, menCategories, womenCategor
                                     </Link>
                                 ))
                                 :
-                                <></>
+                                <DropdownMenuItem className="flex items-center gap-2">
+                                    <Spinner size={'small'}/>
+                                    <span className="text-black/80">fetching women categories</span>
+                                </DropdownMenuItem>
                             }
                         </DropdownMenuSubContent>
                     </DropdownMenuPortal>
@@ -73,7 +81,10 @@ export function HeaderDropdown({ userLogged, router, menCategories, womenCategor
                                     </Link>
                                 ))
                                 :
-                                <></>
+                                <DropdownMenuItem className="flex items-center gap-2">
+                                    <Spinner size={'small'}/>
+                                    <span className="text-black/80">fetching men categories</span>
+                                </DropdownMenuItem>
                             }
                         </DropdownMenuSubContent>
                     </DropdownMenuPortal>
@@ -87,20 +98,18 @@ export function HeaderDropdown({ userLogged, router, menCategories, womenCategor
                             <DropdownMenuItem className="flex gap-2" onClick={() => { router.push('/user/wishlist') } }>
                                 <PiHeart size={`16px`} />
                                 <span>Wishlist</span>
-                                {/* <div className="bg-red-400 w-6 h-6 rounded-full absolute right-2 flex justify-center items-center">
-                                    <span className="text-white text-xs flex justify-center items-center font-light scale-[92%]">99+</span>
-                                </div> */}
+                                {   wishlistItems &&
+                                    wishlistItems?.length > 0 ?
+                                    <div className="bg-red-400 w-6 h-6 rounded-full absolute right-2 flex justify-center items-center">
+                                        <span className="text-white text-xs flex justify-center items-center font-light scale-[92%]">{ wishlistItems.length < 100 ? wishlistItems.length : '99+' }</span>
+                                    </div>
+                                    :
+                                    <></>
+                                }
                             </DropdownMenuItem>
                             <DropdownMenuItem className="flex gap-2" onClick={() => { router.push('/user/transaction') } }>
                                 <PiReceipt size={`16px`} />
                                 <span>Order History</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2">
-                                <PiShoppingCartSimple size={`16px`} />
-                                <span>Cart</span>
-                                <div className="absolute right-2">
-                                    <Cart />
-                                </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem className="flex gap-2" onClick={() => { router.push('/user/edit-profile') } }>

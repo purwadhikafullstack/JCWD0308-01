@@ -169,7 +169,6 @@ export class WarehouseController {
         try {
 
             const { selectedCity, address, warehouseName, assignedAdmin } = req.body
-            console.log(req.body)
             const city = await fetch(`https://api.rajaongkir.com/starter/city?id=${selectedCity}`, {
                 method: 'GET',
                 headers: { key: `${process.env.NEXT_PUBLIC_RAJA_ONGKIR_API_KEY}` }
