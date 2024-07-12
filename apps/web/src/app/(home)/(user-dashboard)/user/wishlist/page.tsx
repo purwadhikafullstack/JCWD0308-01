@@ -10,8 +10,7 @@ export default async function Page() {
 
     return (
         <Wrapper title={"Wishlist"} className={""}>
-            Wishlist example
-            {/* <WishlistBlocks user={user && user} /> */}
+            <WishlistBlocks user={user ? user : null} />
         </Wrapper>
     )
 };
