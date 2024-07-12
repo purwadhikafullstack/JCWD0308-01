@@ -68,11 +68,11 @@ export default class App {
   }
 
   private setupScheduler(): void {
-    // Example cron job to run every day at midnight
     cron.schedule('0 */4 * * *', async () => {
-      console.log('Running daily scheduler job');
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const fourHoursAgo = new Date()
+      fourHoursAgo.setDate(fourHoursAgo.getHours() - 1)
 
       try {
         const ordersToUpdate = await prisma.order.findMany({
@@ -88,6 +88,17 @@ export default class App {
           await prisma.order.update({
             where: { id: order.id },
             data: { status: 'COMPLETED' },
+          });
+        }
+
+        const failedOrder = await prisma.order.findMany({
+          where: { status: 'PENDING_PAYMENT', paymentStatus: 'PENDING', createdAt: { lt: fourHoursAgo } }
+        })
+
+        for (const order of failedOrder) {
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { status: 'CANCELLED', paymentStatus: 'FAILED' },
           });
         }
 

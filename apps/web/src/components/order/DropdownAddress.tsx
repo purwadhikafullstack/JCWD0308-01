@@ -12,7 +12,7 @@ interface DropdownAddressProps {
     setWarehouseId: (value: string) => void
 }
 
-export default function DropdownAddress({setUserAddress, setWarehouseId} : DropdownAddressProps) {
+export default function DropdownAddress({ setUserAddress, setWarehouseId }: DropdownAddressProps) {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [cities, setCities] = useState<City[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<string>('');
@@ -20,7 +20,8 @@ export default function DropdownAddress({setUserAddress, setWarehouseId} : Dropd
     const [address, setAddress] = useState<string>('');
     const [addressList, setAddressList] = useState<Address[]>([]);
     const [warehouse, setWarehouse] = useState<Warehouse | null>(null)
-    const [ labelAddress, setLabelAddress ] = useState('');
+    const [labelAddress, setLabelAddress] = useState('');
+    console.log(addressList);
 
     const fetchProvinces = async () => {
         try {
@@ -57,6 +58,9 @@ export default function DropdownAddress({setUserAddress, setWarehouseId} : Dropd
         setSelectedProvince('');
         setSelectedCity('');
         setAddress('');
+        setTimeout(() => {
+            window.location.reload()
+        }, 200)
     };
 
     const removeAddress = () => {
@@ -122,7 +126,7 @@ export default function DropdownAddress({setUserAddress, setWarehouseId} : Dropd
                                         setSelectedProvince={setSelectedProvince}
                                         address={address}
                                         setAddress={setAddress}
-                                        fetchCities={fetchCities} labelAddress={labelAddress} setLabelAddress={setLabelAddress} forWarehouse={false}                                    />
+                                        fetchCities={fetchCities} labelAddress={labelAddress} setLabelAddress={setLabelAddress} forWarehouse={false} />
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter className={`${!address || !selectedCity ? 'cursor-not-allowed' : ''}`}>

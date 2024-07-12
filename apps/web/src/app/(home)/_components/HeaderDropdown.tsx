@@ -111,13 +111,6 @@ export function HeaderDropdown({ userLogged, router, menCategories, womenCategor
                                 <PiReceipt size={`16px`} />
                                 <span>Order History</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2">
-                                <PiShoppingCartSimple size={`16px`} />
-                                <span>Cart</span>
-                                <div className="absolute right-2">
-                                    <Cart />
-                                </div>
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem className="flex gap-2" onClick={() => { router.push('/user/edit-profile') } }>
                                 <PiUser size={`16px`} />
