@@ -10,6 +10,7 @@ import { AddressRouter } from './address.router'
 import { AdminRouter } from './admin.router'
 import { MutationRouter } from './mutation.router'
 import { SalesRouter } from './sales.router'
+import { WishlistRouter } from './wishlist.router'
 
 
 export class ApiRouter {
@@ -25,6 +26,7 @@ export class ApiRouter {
     private addressRouter: AddressRouter
     private mutationRouter: MutationRouter
     private salesRouter: SalesRouter
+    private wishlistRouter: WishlistRouter
 
 
     constructor() {
@@ -41,6 +43,7 @@ export class ApiRouter {
         this.addressRouter = new AddressRouter()
         this.mutationRouter = new MutationRouter()
         this.salesRouter = new SalesRouter()
+        this.wishlistRouter = new WishlistRouter()
         this.initializeRoutes();
     }
 
@@ -56,6 +59,7 @@ export class ApiRouter {
         this.router.use('/address', this.addressRouter.getRouter())
         this.router.use('/mutations', this.mutationRouter.getRouter())
         this.router.use('/sales', this.salesRouter.getRouter())
+        this.router.use('/wishlist', this.wishlistRouter.getRouter())
     }
 
     getRouter(): Router {

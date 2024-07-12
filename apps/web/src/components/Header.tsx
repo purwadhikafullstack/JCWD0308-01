@@ -1,10 +1,10 @@
 'use client'
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
-import { cn, shuffleArray } from "@/lib/utils"
+import { cn, getUserClientSide, shuffleArray } from "@/lib/utils"
 import Cookies from "js-cookie";
 import { isTokenExp } from "@/lib/utils";
-import { PiFireSimple, PiMagnifyingGlass, PiStackSimple } from "react-icons/pi";
+import { PiStackSimple } from "react-icons/pi";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import { HeaderDropdown } from "../app/(home)/_components/HeaderDropdown";
 import AccountMenu from "@/app/(home)/_components/AccountMenu";
@@ -13,8 +13,9 @@ import { useRouter } from "next/navigation"
 import { Search } from "./search";
 import { toast } from "sonner";
 import { getRequest } from "@/lib/fetchRequests";
-import { ICategory } from "@/constants";
+import { ICategory, IProduct } from "@/constants";
 import { Spinner } from "./ui/spinner";
+import { IUser } from "@/app/(home)/(user-dashboard)/user/edit-profile/_components/EditProfileForm";
 
 const components: { title: string; href: string; description: string }[] = [
     {
@@ -59,7 +60,13 @@ export function Header() {
     const [userLogged, setUserLogged] = useState(false);
     const [ menCategories, setMenCategories ] = useState([]);
     const [ womenCategories, setWomenCategories ] = useState([]);
+    const [ currentUser, setCurrentUser ] = useState<IUser | null | undefined>();
+    const [ wishlistItems, setWishlistItems ] = useState<IProduct[] | []>();
     const router = useRouter()
+    async function getUser() {
+        const user  = await getUserClientSide()
+        setCurrentUser(user)
+    }
 
     async function fetchMenCategory() {
         try {
@@ -81,13 +88,30 @@ export function Header() {
         }
     }
 
+    async function getWishlistItems() {
+        try {
+            if (currentUser) {
+                const res = await getRequest(`wishlist/${currentUser?.id}`)
+                const data = await res.json();
+                setWishlistItems(data.data)
+            }
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'error fetching wishlist')
+        }
+    }
+
     useEffect(() => {
         const token = Cookies.get('token')
         const role = Cookies.get('role')
         if (token && (role == 'user' && !isTokenExp(token))) setUserLogged(true)
+        getUser()
         fetchMenCategory()
         fetchWomenCategory()
     }, [])
+
+    useEffect(() => {
+        getWishlistItems()
+    }, [ currentUser ])
 
     return (
         <div className="p-4 flex justify-center border-b-[1px] sticky top-0 bg-white z-50">
@@ -102,11 +126,9 @@ export function Header() {
                         </Link>
                     </NavigationMenuItem>
 
-                    <div className="hidden md:flex">
-                        <NavigationMenuItem>
-                            <div className="relative">
-                                <Search />
-                            </div>
+                    <div className="md:flex">
+                        <NavigationMenuItem className="max-[550px]:hidden">
+                            <div className="relative"><Search /></div>
                         </NavigationMenuItem>
 
                         <div className="hidden lg:flex">
@@ -163,18 +185,18 @@ export function Header() {
                             </NavigationMenuItem>
                         </div>
 
-                        <NavigationMenu className="md:block lg:hidden">
+                        <NavigationMenu className="hidden md:block lg:hidden">
                             <CatalogDropdown />
                         </NavigationMenu>
                     </div>
 
                     <NavigationMenuItem className="hidden md:flex">
-                        <AccountMenu userLogged={userLogged} router={router} />
+                        <AccountMenu wishlistItems={wishlistItems} userLogged={userLogged} router={router} />
                     </NavigationMenuItem>
 
                     <NavigationMenuItem className="md:hidden">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            <HeaderDropdown userLogged={userLogged} router={router} menCategories={menCategories} womenCategories={womenCategories} />
+                            <HeaderDropdown wishlistItems={wishlistItems} userLogged={userLogged} router={router} menCategories={menCategories} womenCategories={womenCategories} />
                         </NavigationMenuLink>
                     </NavigationMenuItem>
 

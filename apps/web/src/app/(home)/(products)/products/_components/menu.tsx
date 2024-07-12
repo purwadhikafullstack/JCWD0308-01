@@ -1,20 +1,32 @@
 'use client'
 
 import { getVariantStock } from '@/app/action';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { IProduct, ISizeSum } from '@/constants';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner';
-import { PiShoppingCart } from "react-icons/pi";
 import AddToCartButton from '@/components/cart/AddToCartButton';
+import { postRequest } from '@/lib/fetchRequests';
+import { Separator } from '@/components/ui/separator';
+import { getUserClientSide, isTokenExp } from '@/lib/utils';
+import { IUser } from '@/app/(dashboard)/admins/users/page';
+import { useRouter } from 'next/navigation';
+import WishlistLikedBtn from '@/components/WishlistLikedBtn';
+import Cookies from 'js-cookie';
 
 interface ICarousel {
     product:IProduct
     setIndex: React.Dispatch<React.SetStateAction<number>>
     index: number
     sizeSum: ISizeSum[]
-  }
+}
+
+export interface IWishlist {
+    id: string,
+    userId: string,
+    productId: string,
+    createdAt: Date
+}
   
 
 export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
@@ -24,8 +36,11 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
     const [size, setSize] = useState(product.oneSize ? 'ONESIZE' : 'S')
     const [stock, setStock] = useState(0)
     const [qty, setQty] = useState(0)
-    console.log({colorID, color, size, stock, qty});
-    
+    const [ currentUser, setCurrentUser ] = useState<IUser | null>()
+    const [ totalLikes, setTotalLikes ] = useState<number>(0)
+    const [ isLiked, setIsLiked ] = useState<boolean>(false)
+    const [userLogged, setUserLogged] = useState(false);
+    const router = useRouter();
     
     useEffect(() => {
         const getData = async() => {
@@ -49,6 +64,71 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
             }
         }
     }, [stock, colorID, sizeSum, product.oneSize]);
+
+    async function getUser() {
+        const user = await getUserClientSide()
+        setCurrentUser(user)
+    }
+
+    async function getWishlist() {
+        try {
+            if (currentUser && product) {
+                const res = await postRequest({ userId: currentUser?.id, productId: product.id }, 'wishlist/get-wishlist/')
+                if (res.ok) {
+                    setIsLiked(true)
+                }
+            }
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Error while checking this item on your wishlist")
+        }
+    }
+
+    async function handleCreateWishlist() {
+        try {
+            if ((currentUser && product) && userLogged) {
+                const res = await postRequest({ userId: currentUser?.id, productId: product.id }, 'wishlist/')
+                const data = await res.json()
+                if (res.ok) {
+                    toast.success(data.message)
+                    router.refresh();
+                    setIsLiked(!isLiked)
+                    getTotalLikes()
+                }
+            } else {
+                toast.warning(`You need to login to add ${ product && product?.name ? product.name : 'item' } to wishlist`)
+            }
+
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Error while saving item to your wishlist")
+        }
+    }
+
+    async function getTotalLikes() {
+        try {
+            if (product) {
+                const res = await postRequest({ productId: product.id }, 'wishlist/total-likes/')
+                const data = await res.json()
+                if (res.ok) {
+                    setTotalLikes(data.data.length)
+                    router.refresh();
+                }
+            } 
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Error while checking this item on your wishlist")
+        }
+    }
+
+    useEffect(() => {
+        const token = Cookies.get('token')
+        const role = Cookies.get('role')
+        if (token && (role == 'user' && !isTokenExp(token))) setUserLogged(true)
+        getTotalLikes()
+        getUser()
+    }, [ ])
+
+    useEffect(() => {
+        getWishlist()
+    }, [ currentUser ])
 
   return (
       <div>
@@ -99,30 +179,36 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
             <p className='font-semibold'>Quantity</p>
             <div className='flex justify-between items-center gap-4'>
                 <Input
-                        disabled={stock !== 0 ? false : true}
-                        type='text'
-                        inputMode='decimal'
-                        placeholder="0"
-                        value={qty ?? ''}
-                        className="focus-visible:ring-black/0 focus-visible:border-black/60 text-center h-10 w-24 my-2"
-                        onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "" || !isNaN(Number(value))) {
-                            if (isNaN(Number(value)) || Number(value) > 5) {
-                            toast.warning("Maximum quantity is 5.");
-                            } else {
-                            setQty(Number(value));
-                            }
+                    disabled={stock !== 0 ? false : true}
+                    type='text'
+                    inputMode='decimal'
+                    placeholder="0"
+                    value={qty ?? ''}
+                    className="focus-visible:ring-black/0 focus-visible:border-black/60 text-center h-10 w-24 my-2"
+                    onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || !isNaN(Number(value))) {
+                        if (isNaN(Number(value)) || Number(value) > 5) {
+                        toast.warning("Maximum quantity is 5.");
+                        } else {
+                        setQty(Number(value));
                         }
-                        }}
-                    />  
-                    <AddToCartButton variantId={colorID} color={color} quantity={qty} size={size} stock={stock}/>
+                    }
+                    }}
+                />
+                <AddToCartButton variantId={colorID} color={color} quantity={qty} size={size} stock={stock}/>
                 {/* <Button className=' w-full gap-2' disabled={stock == 0 ? true : false}>
                     ADD TO CART
                     <PiShoppingCart className='text-xl'/>
                 </Button> */}
             </div>
             <p className='text-xs text-gray-500'>Stock: {stock}</p>
+            <Separator className="my-3"/>
+            <div className='flex items-center gap-2'>
+                <WishlistLikedBtn func={handleCreateWishlist} isLiked={isLiked}/>
+                <span className={` text-black/70 ${ totalLikes > 0 ? 'hidden' : 'block' }`}>Be the first to put this item to wishlist</span>
+                <span className={`text-black/70 ${ totalLikes == 0 ? 'hidden' : 'block' }`}>{ totalLikes } { totalLikes > 1 ? 'people' : 'person' } like{ totalLikes > 1 ? '' : 's' } this item</span>
+            </div>
         </div>
         
     </div>

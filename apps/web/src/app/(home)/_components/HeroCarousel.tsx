@@ -15,11 +15,6 @@ import { PiArrowRight } from "react-icons/pi";
 export default function HeroCarousel() {
     const videos = [
         {
-            sd: 'https://videos.pexels.com/video-files/4613100/4613100-sd_640_338_25fps.mp4',
-            hd: 'https://videos.pexels.com/video-files/4613100/4613100-hd_1366_720_25fps.mp4',
-            uhd: 'https://videos.pexels.com/video-files/4613100/4613100-uhd_2732_1440_25fps.mp4',
-        },
-        {
             sd: 'https://videos.pexels.com/video-files/4125025/4125025-sd_640_360_24fps.mp4',
             hd: 'https://videos.pexels.com/video-files/4125025/4125025-hd_1280_720_24fps.mp4',
             uhd: 'https://videos.pexels.com/video-files/4125025/4125025-uhd_2560_1440_24fps.mp4',
@@ -28,6 +23,11 @@ export default function HeroCarousel() {
             sd: 'https://videos.pexels.com/video-files/4919748/4919748-sd_640_338_25fps.mp4',
             hd: 'https://videos.pexels.com/video-files/4919748/4919748-hd_1366_720_25fps.mp4',
             uhd: 'https://videos.pexels.com/video-files/4919748/4919748-uhd_2732_1440_25fps.mp4',
+        },
+        {
+            sd: 'https://videos.pexels.com/video-files/4613100/4613100-sd_640_338_25fps.mp4',
+            hd: 'https://videos.pexels.com/video-files/4613100/4613100-hd_1366_720_25fps.mp4',
+            uhd: 'https://videos.pexels.com/video-files/4613100/4613100-uhd_2732_1440_25fps.mp4',
         },
     ]
     const [index, setIndex] = useState(0);
