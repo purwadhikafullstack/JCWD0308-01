@@ -1,15 +1,13 @@
-import React from "react"
-import MarqueeBackground from "./(account)/_components/MarqueeBackground"
-import BrickPhotoBackground from "./(account)/_components/BrickPhotoBackground"
-import { randomizer } from "./(account)/(account-setup)/layout"
-import { PiArrowLeft, PiArrowRight, PiWarning } from "react-icons/pi"
+import { randomizer } from "@/app/(account)/(account-setup)/layout"
+import BrickPhotoBackground from "@/app/(account)/_components/BrickPhotoBackground"
+import MarqueeBackground from "@/app/(account)/_components/MarqueeBackground"
 import Link from "next/link"
+import React from "react"
+import { PiArrowRight, PiWarning } from "react-icons/pi"
 
-export default function Page() {
-
+export default function NotFound() {
     return (
-        <div>
-            <div className='h-screen flex justify-center items-center relative overflow-hidden'>
+        <div className='h-screen flex justify-center items-center relative overflow-hidden'>
                 { randomizer ? <BrickPhotoBackground /> : <MarqueeBackground/> }
                 <div className="w-96 p-8 z-10 bg-white/90 absolute rounded-lg">
                     <div className="mb-8">
@@ -28,7 +26,6 @@ export default function Page() {
                     </div>
                 </div>
             </div>
-        </div>
     )
 };
 

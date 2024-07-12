@@ -23,10 +23,10 @@ export class AdminRouter {
         this.router.get('/:id', this.adminController.getAdminById);
         this.router.patch('/re-verify-account', verifyToken, this.accountController.verifyAdmin);
         this.router.patch('/personal/:id', this.adminController.updatePersonalInfo);
-        this.router.patch('/:id', this.adminController.updatePhoto);
         this.router.patch('/email/:id', this.adminController.editEmail)
         this.router.patch('/name/:id', this.adminController.editFullName)
-        this.router.delete('photo/:id', this.adminController.removePhoto);
+        this.router.patch('/:id', this.adminController.updatePhoto);
+        this.router.delete('/photo/:id', this.adminController.removePhoto);
         this.router.delete('/:id', this.adminController.dischargeAdmin);
     }
 

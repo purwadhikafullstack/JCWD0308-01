@@ -8,7 +8,7 @@ import { LoadingButton } from "@/components/ui/loading-button";
 import { PiUserCircleThin, PiXBold, PiCheckBold, PiWarningCircle } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { getRequest, patchRequest } from "@/lib/fetchRequests";
+import { deleteRequest, getRequest, patchRequest } from "@/lib/fetchRequests";
 import useStorage from "@/hooks/useStorage";
 import { toast } from "sonner";
 import { IAdmin } from "../../admins/_components/columns";
@@ -36,11 +36,11 @@ export default function AdminMenu({ admin }: { admin: IAdmin | null }) {
     const [ assignedWarehouse, setAssignedWarehouse ] = useState<Warehouse| null>()
     const [ open, setOpen ] = useState(false)
     const { uploadFile } = useStorage()
-    const [ currentPhotoProfile, setCurrentPhotoProfile ] = useState<any>(admin?.imgUrl);
+    const [ currentPhotoProfile, setCurrentPhotoProfile ] = useState<string | null | undefined>(admin?.imgUrl);
 
     function showDeleteBtn() {
         const trashIcon = document.getElementById('dashboard-trash-icon') as HTMLElement;
-        trashIcon?.classList.add('right-2')
+        trashIcon?.classList.add('right-10')
         trashIcon?.classList.add('opacity-100')
         trashIcon?.classList.remove('right-12')
         trashIcon?.classList.remove('opacity-0')
@@ -55,63 +55,67 @@ export default function AdminMenu({ admin }: { admin: IAdmin | null }) {
     }
 
     async function handleChangePhoto() {
-        // if (admin) {
-        //     setIsloading(true)
-        //     try {
-        //         let imgUrl: string = ''
-        //         if (file) imgUrl = await uploadFile(file, 'profile')
-        //         const res = await patchRequest({ imgUrl: imgUrl }, `user/${user.id}`)
-        //         const data = await res.json()
-        //         if (res) setIsloading(false)
-        //         if (res.ok) {
-        //             setFile(null)
-        //             toast.success('Photo profile has been updated')
-        //             const res = await (await getRequest(`user/${user.id}`)).json()
-        //             const currentUser = res.data
-        //             setCurrentPhotoProfile(currentUser.imgUrl)
-        //         } else if (res.status == 404) {
-        //             toast.error('User not found!')
-        //         } else toast.error(data.message)
-        //     } catch (error) {
-        //         toast.error('Server error')
-        //     }
-        // }
+        if (admin) {
+            setIsloading(true)
+            try {
+                let imgUrl: string = ''
+                if (file) imgUrl = await uploadFile(file, 'profile')
+                const res = await patchRequest({ imgUrl: imgUrl }, `admin/${admin.id}`)
+                const data = await res.json()
+                console.log(data)
+                if (res) setIsloading(false)
+                if (res.ok) {
+                    setFile(null)
+                    toast.success('Photo profile has been updated')
+                    const resUser = await (await getRequest(`admin/${admin.id}`)).json()
+                    const currentUser = resUser.data
+                    console.log(resUser)
+                    setCurrentPhotoProfile(currentUser.imgUrl)
+                } else if (res.status == 404) {
+                    toast.error('User not found!')
+                } else toast.error(data.message)
+            } catch (error) {
+                toast.error('Server error')
+            }
+        }
     }
 
     async function handleRemovePhotoProfile(){
-        // if (user) {
-        //     setIsloading(true)
-        //     const res = await (await deleteRequest(`user/${user.id}`)).json()
-        //     try {
-        //         if (res) setIsloading(false)
-        //         if (res.status == 'ok') {
-        //             toast.success(res.message)
-        //             const response = await (await getRequest(`user/${user.id}`)).json()
-        //             const currentUser = response.data
-        //             setCurrentPhotoProfile(currentUser.imgUrl)
-        //             setOpen(false)
-        //         } else {
-        //             toast.error(res.message)
-        //         }
-        //     } catch (error) {
-        //         setIsloading(false)
-        //         toast.error(res.message)
-        //     }
-        // }
+        if (admin) {
+            setIsloading(true)
+            const res = await (await deleteRequest(`admin/photo/${admin.id}`)).json()
+            try {
+                if (res) setIsloading(false)
+                if (res.status == 'ok') {
+                    toast.success(res.message)
+                    const response = await (await getRequest(`admin/${admin.id}`)).json()
+                    const currentUser = response.data
+                    setCurrentPhotoProfile(currentUser.imgUrl)
+                    setOpen(false)
+                } else {
+                    toast.error(res.message)
+                }
+            } catch (error) {
+                setIsloading(false)
+                toast.error(res.message)
+            }
+        }
     }
 
-    async function refreshUser() {
-        const user = await getAdminClientSide(); setCurrentAdmin(admin)
+    async function refreshAdmin() {
+        const admin = await getAdminClientSide(); setCurrentAdmin(admin)
     }
 
     async function getWarehouseByAdmin() {
         try {
-            const res = await getRequest(`warehouses/assigned-warehouse/${admin?.id}`);
-            const data = await res.json();
-            if (res.ok) {
-                setAssignedWarehouse(data.data);
-            } else {
-                setAssignedWarehouse(null);
+            if (admin?.role == 'warAdm') {
+                const res = await getRequest(`warehouses/assigned-warehouse/${admin?.id}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setAssignedWarehouse(data.data);
+                } else {
+                    setAssignedWarehouse(null);
+                }
             }
         } catch (error) {
             toast.error(error instanceof Error? error.message : `Something went wrong while fetching assigned warehouse by admin id`)
@@ -119,9 +123,8 @@ export default function AdminMenu({ admin }: { admin: IAdmin | null }) {
     }
 
     useEffect(() => {
-        
         getWarehouseByAdmin()
-        refreshUser()
+        refreshAdmin()
     }, [ currentPhotoProfile ])
 
     return (
