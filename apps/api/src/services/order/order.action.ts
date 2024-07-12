@@ -116,7 +116,7 @@ export async function failedOrder(orderId: string) {
         data: {
             id: uuidv4(),
             paymentStatus: "FAILED",
-            status: "CART",
+            status: "CANCELLED",
         }
     })
     return updateOrder
@@ -124,7 +124,6 @@ export async function failedOrder(orderId: string) {
 
 async function getAllOrder(warehouseId: string | null, query: string, page: string, limit: string, warehouse: string, fromDate: Date, toDate: Date) {
     if (warehouseId === 'none') return null;
-    console.log(fromDate);
 
     const whereCondition: any = {
         AND: [
@@ -133,7 +132,14 @@ async function getAllOrder(warehouseId: string | null, query: string, page: stri
                 OR: [
                     { id: { contains: query } },
                 ]
-            }
+            },
+            {
+                NOT: {
+                    status: {
+                        in: ['CART'],
+                    },
+                },
+            },
         ]
     };
 

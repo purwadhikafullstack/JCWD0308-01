@@ -54,10 +54,10 @@ export default function Cart() {
     return (
         <Sheet>
             <SheetTrigger className="align-middle relative flex">
-                <PiShoppingCartSimple className="max-md:hidden" size={`20px`} />
+                <PiShoppingCartSimple className="" size={`20px`} />
                 {quantity > 0 && (
-                    <div className="bg-red-400 w-6 h-6 rounded-full md:absolute -top-4 -right-4 border-2 border-white flex justify-center items-center">
-                        <span className="text-white text-sm flex justify-center items-center font-light scale-[92%] md:scale-[82%] ">{quantity}</span>
+                    <div className="bg-red-400 w-5 h-5 md:w-6 md:h-6 rounded-full absolute -top-3 md:-top-4 -right-3 md:-right-4 border-2 border-white flex justify-center items-center">
+                        <span className="text-white  text-[.7rem] md:text-sm flex justify-center items-center font-light md:scale-[82%] ">{quantity}</span>
                     </div>
                 )}
             </SheetTrigger>

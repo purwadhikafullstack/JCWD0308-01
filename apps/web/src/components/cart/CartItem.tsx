@@ -34,7 +34,7 @@ export default function CartItem({item, stockData}: OrderItemProps) {
     const isOutOfStock = stockInfo && stockInfo.totalStock < item.quantity;
     
     return (
-        <div className='relative flex w-full gap-4'>
+        <div className='relative flex flex-col md:flex-row w-full gap-4'>
             <div className='relative flex h-32 rounded-md'>
                 <Image src={item.productVariant.image} alt='none'
                     className='object-cover rounded-md' width={200} height={200} />

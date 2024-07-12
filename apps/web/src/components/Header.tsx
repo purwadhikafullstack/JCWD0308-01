@@ -16,6 +16,7 @@ import { getRequest } from "@/lib/fetchRequests";
 import { ICategory, IProduct } from "@/constants";
 import { Spinner } from "./ui/spinner";
 import { IUser } from "@/app/(home)/(user-dashboard)/user/edit-profile/_components/EditProfileForm";
+import Cart from "./cart/Cart";
 
 const components: { title: string; href: string; description: string }[] = [
     {
@@ -194,7 +195,8 @@ export function Header() {
                         <AccountMenu wishlistItems={wishlistItems} userLogged={userLogged} router={router} />
                     </NavigationMenuItem>
 
-                    <NavigationMenuItem className="md:hidden">
+                    <NavigationMenuItem className="flex gap-2 items-center md:hidden">
+                        <Cart/>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             <HeaderDropdown wishlistItems={wishlistItems} userLogged={userLogged} router={router} menCategories={menCategories} womenCategories={womenCategories} />
                         </NavigationMenuLink>
