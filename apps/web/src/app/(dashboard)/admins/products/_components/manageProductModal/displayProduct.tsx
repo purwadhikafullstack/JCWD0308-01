@@ -25,6 +25,7 @@ export const AdminProductDisplay = ({page, setPage, getData,productList, product
 				page={page}
 			/>
 			<PaginationTemplate
+			limiter={10}
 			setPage={setPage}
 			page={page}
 			productQty={productQty}

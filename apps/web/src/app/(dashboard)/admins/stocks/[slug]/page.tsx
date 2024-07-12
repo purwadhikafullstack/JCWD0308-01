@@ -26,7 +26,7 @@ const monthFirstDate = () => {
 export default function Page() {
     const {slug} = useParams()
     const typeArr = ['All','Restock', 'Remove', 'Transfer', 'Inbound', 'Delete', 'Transaction']
-    const [selectedWH, setSelectedWH] = useState('All Warehouses')
+    const [selectedWH, setSelectedWH] = useState('')
     const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
     const [StockList, setStockList] = useState<IStockMutationItem[]>([])
     const [productData, setProductData] = useState<IProduct>()
@@ -42,24 +42,32 @@ export default function Page() {
       to: new Date(),
     })
   
-    const getAdmWH = async() => {
-      const admin = await getAdminClientSide()
-      const warehouse = await getWarehouse(admin.id)
-      setWarehouseList(warehouse)
-      if (admin.role == 'warAdm') {
-        setSelectedWH(warehouse[0].warehouseName)
-      } else if (admin.role == 'superAdm') {
-        setIsSuper(true)
-      }
-    }    
-  
     useEffect(() => {
-      getAdmWH()
-    }, [])
+      const getAdmWH = async() => {
+        try {
+          const admin = await getAdminClientSide()
+          const warehouse = await getWarehouse(admin.id)
+          setWarehouseList(warehouse)
+          if (admin.role == 'warAdm') {
+            if (!warehouse || warehouse.length == 0) {
+              setSelectedWH('Not Assigned')
+              throw 'You are not assigned to any warehouse.'
+            }
+            setSelectedWH(warehouse[0].warehouseName)
+          } else if (admin.role == 'superAdm') {
+            setSelectedWH('All Warehouses')
+            setIsSuper(true)
+          }
+        } catch (error:any) {
+          typeof(error) == 'string' ? toast.error(error) : toast.error('Failed to get data.')
+        }
+      }
+      getAdmWH();
+    }, []);
   
     useEffect(() => {
       const getData = async() => {
-        if (date?.from && date?.to && selectedWH && selectedWH !== 'Not Assigned') {
+        if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
           try {
             window.scrollTo(0, 0);
             const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH

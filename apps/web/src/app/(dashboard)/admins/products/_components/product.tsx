@@ -26,7 +26,7 @@ const monthFirstDate = () => {
 
 
 export  function Products() {
-const [selectedWH, setSelectedWH] = useState('All Warehouses')
+const [selectedWH, setSelectedWH] = useState('')
 const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
 const [productList, setProductList] = useState<IProduct[]>([])
 const [open, setOpen] = useState(false);
@@ -54,7 +54,7 @@ const debounced = useDebouncedCallback(
 
 
 const getData = useCallback(async () => {
-  if (date?.from && date?.to && selectedWH && selectedWH !== 'Not Assigned') {
+  if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
     window.scrollTo(0, 0);
     const g = gender === "All" ? '' : gender;
     const t = type === "All" ? '' : type;

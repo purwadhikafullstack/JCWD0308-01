@@ -18,11 +18,6 @@ interface ICarousel {
     product:IProduct
     setIndex: React.Dispatch<React.SetStateAction<number>>
     sizeSum: ISizeSum[]
-<<<<<<< HEAD
-  }
-
-  
-=======
 }
 
 export interface IWishlist {
@@ -31,7 +26,6 @@ export interface IWishlist {
     productId: string,
     createdAt: Date
 }
->>>>>>> 9876141283015ed98c36274a7824b5cd835fec37
   
 
 export const ProductMenu = ({product, setIndex, sizeSum}:ICarousel) => {
@@ -41,17 +35,11 @@ export const ProductMenu = ({product, setIndex, sizeSum}:ICarousel) => {
     const [size, setSize] = useState(product.oneSize ? 'ONESIZE' : 'S')
     const [stock, setStock] = useState(0)
     const [qty, setQty] = useState(0)
-<<<<<<< HEAD
-
-    
-    
-=======
     const [ currentUser, setCurrentUser ] = useState<IUser | null>()
     const [ totalLikes, setTotalLikes ] = useState<number>(0)
     const [ isLiked, setIsLiked ] = useState<boolean>(false)
     const [userLogged, setUserLogged] = useState(false);
     const router = useRouter();
->>>>>>> 9876141283015ed98c36274a7824b5cd835fec37
     
     useEffect(() => {
         const getData = async() => {

@@ -35,7 +35,7 @@ export default function DisplayOrder({ warehouse }: DisplayOrderProps) {
     const router = useRouter()
 
     const warehouseData = useCallback(async (warehouse: string) => {
-        if (warehouse !== 'Not Assigned') {
+        if (warehouse !== 'Not Assigned' && warehouse !== '') {
             let newUrl = ''
             if (warehouse && warehouse !== 'All Warehouses') {
                 newUrl = formUrlQuery({

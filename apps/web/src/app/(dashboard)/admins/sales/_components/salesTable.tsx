@@ -74,6 +74,7 @@ interface IStockTable {
           </TableBody>
         </Table>
         <PaginationTemplate
+        limiter={10}
         setPage={setPage}
         page={page}
         productQty={productQty}

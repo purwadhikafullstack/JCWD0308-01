@@ -9,7 +9,7 @@ import { WarehouseDropdown } from '../../_components/warehouseDropdown'
 import { toast } from 'sonner'
 
 export default function Page() {
-  const [selectedWH, setSelectedWH] = useState('All Warehouses')
+  const [selectedWH, setSelectedWH] = useState('')
   const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
   const [isSuper, setIsSuper] = useState(false)
 

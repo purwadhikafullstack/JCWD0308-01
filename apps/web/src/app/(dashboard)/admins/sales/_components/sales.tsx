@@ -24,7 +24,7 @@ const monthFirstDate = () => {
 }
 
 export const SalesReport = () => {  
-  const [selectedWH, setSelectedWH] = useState('All Warehouses')
+  const [selectedWH, setSelectedWH] = useState('')
   const [warehouseList, setWarehouseList] = useState<IWarehouse[]>([])
   const [productQty, setProductQty] = useState(0)
   const [salesList, setSalesList] = useState<IProduct[]>([])
@@ -49,7 +49,7 @@ export const SalesReport = () => {
   )
 
   const getData = async() => {
-    if (date?.from && date?.to && selectedWH && selectedWH !== 'Not Assigned') {
+    if (date?.from && date?.to && selectedWH !== '' && selectedWH !== 'Not Assigned') {
       window.scrollTo(0, 0);
       const warehouse = selectedWH == 'All Warehouses'? '' : selectedWH
       const g = gender == "All" ? '' : gender

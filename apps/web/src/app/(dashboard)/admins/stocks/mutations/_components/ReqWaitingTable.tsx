@@ -98,7 +98,7 @@ interface IRequestTable {
           }
           </TableBody>
         </Table>
-        <PaginationTemplate page={page} productQty={productQty} setPage={setPage}/>
+        <PaginationTemplate page={page} productQty={productQty} setPage={setPage} limiter={5}/>
       </div>
     )
   }

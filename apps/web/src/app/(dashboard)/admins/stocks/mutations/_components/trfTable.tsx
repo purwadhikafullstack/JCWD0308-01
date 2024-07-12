@@ -126,7 +126,7 @@ export function TransferTable({selectedWH, open, setOpen, getQty}:IHistoryTable)
           }
         </TableBody>
       </Table>
-      <PaginationTemplate page={page} productQty={productQty} setPage={setPage}/>
+      <PaginationTemplate page={page} productQty={productQty} setPage={setPage} limiter={5}/>
     </div>
   )
 }
