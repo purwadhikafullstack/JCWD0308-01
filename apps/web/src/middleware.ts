@@ -33,7 +33,7 @@ export function middleware(req: NextRequest) {
 
                 if (pathname.startsWith('/auth')) {
                     if (decoded.role === 'warAdm' || decoded.role === 'superAdm') {
-                        return NextResponse.redirect(new URL('/admins/overview', req.url));
+                        return NextResponse.redirect(new URL('/admins/products', req.url));
                     }
                     return NextResponse.redirect(new URL('/', req.url));
                 }
@@ -47,7 +47,7 @@ export function middleware(req: NextRequest) {
                     if (decoded.role === 'superAdm') {
                         return NextResponse.next();
                     } else if (decoded.role === 'warAdm') {
-                        return NextResponse.redirect(new URL('/admins/overview', req.url));
+                        return NextResponse.redirect(new URL('/admins/products', req.url));
                     }
                     return NextResponse.redirect(new URL('/', req.url));
                 } else if (pathname.startsWith('/user')) {
@@ -55,7 +55,7 @@ export function middleware(req: NextRequest) {
                         return NextResponse.next();
                     }
                     if (decoded.role === 'warAdm' || decoded.role === 'superAdm') {
-                        return NextResponse.redirect(new URL('/admins/overview', req.url));
+                        return NextResponse.redirect(new URL('/admins/products', req.url));
                     }
                     return NextResponse.redirect(new URL('/auth', req.url));
                 } else if (pathname === '/') {
@@ -63,7 +63,7 @@ export function middleware(req: NextRequest) {
                 } 
                 // else if (pathname.startsWith('/catalog')) {
                 //     if (decoded.role === 'warAdm' || decoded.role === 'superAdm') {
-                //         return NextResponse.redirect(new URL('/admins/overview', req.url));
+                //         return NextResponse.redirect(new URL('/admins/products', req.url));
                 //     }
                 //     return NextResponse.next();
                 // }

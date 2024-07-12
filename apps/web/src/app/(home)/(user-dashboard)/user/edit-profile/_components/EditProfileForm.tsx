@@ -184,8 +184,9 @@ export default function EditProfileForm({ user } : { user: IUser | null }) {
                     </div>
 
                     <span className="text-black/60 text-xs">*Changing your email will be required you to re-verify your account</span>
-                    <LoadingButton type="submit" loading={isLoading} className="px-10 flex items-center gap-2 w-fit max-sm:w-full">Save Change<PiFloppyDiskBold size={`1rem`}/></LoadingButton>
-                
+                    <div className="flex justify-end">
+                        <LoadingButton type="submit" loading={isLoading} className="px-10 flex items-center gap-2 w-fit max-sm:w-full">Save Change<PiFloppyDiskBold size={`1rem`}/></LoadingButton>
+                    </div>
                 </form>
             </Form>
         </div>

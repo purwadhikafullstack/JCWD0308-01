@@ -95,7 +95,7 @@ export const ProductMenu = ({product, setIndex, index, sizeSum}:ICarousel) => {
                     getTotalLikes()
                 }
             } else {
-                toast.warning(`You need to login to add ${ product && product?.name ? product.name : 'item' } to wishlist`)
+                toast.warning(`You need to login as user to add ${ product && product?.name ? product.name : 'item' } to wishlist`)
             }
 
         } catch (error) {
