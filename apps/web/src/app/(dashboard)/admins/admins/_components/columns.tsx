@@ -87,9 +87,9 @@ const AssignCell = ({ row }: { row: Row<IAdmin> }) => {
             const data = await res.json();
             if (res.ok) {
                 if (data.data) {
-                    location.reload()
                     setAssignedWarehouse(data.data)
                     toast.success(data.message)
+                    location.reload()
                 }
             } else {
                 toast.error(data.message)
