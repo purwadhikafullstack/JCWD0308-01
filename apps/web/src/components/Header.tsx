@@ -196,7 +196,9 @@ export function Header() {
                     </NavigationMenuItem>
 
                     <NavigationMenuItem className="flex gap-2 items-center md:hidden">
-                        <Cart/>
+                        {userLogged && (
+                            <Cart />
+                        )}
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             <HeaderDropdown wishlistItems={wishlistItems} userLogged={userLogged} router={router} menCategories={menCategories} womenCategories={womenCategories} />
                         </NavigationMenuLink>
