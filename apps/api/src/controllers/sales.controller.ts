@@ -91,9 +91,9 @@ export class SalesController {
             const totalSales = await prisma.orderItem.aggregate({
                 where: {
                     order: {
-                        status: 'COMPLETED'
+                        status: 'COMPLETED',
+                        warehouseId: warehouse ? warehouse.id : { not: undefined },
                     },
-                    warehouseId: warehouse ? warehouse.id : { not: undefined },
                     productVariant: {
                         product: {
                             name: q 
@@ -170,12 +170,12 @@ export class SalesController {
                             slug
                         }
                     },
-                    warehouseId: warehouse 
-                    ? warehouse.id
-                    : {not: undefined},
                     updatedAt: {gte: fromDate, lte: toDate},
                     order: {
-                        status: 'COMPLETED'
+                        status: 'COMPLETED',
+                        warehouseId: warehouse 
+                        ? warehouse.id
+                        : {not: undefined},
                     }
                 },
                 include: {
@@ -202,9 +202,6 @@ export class SalesController {
                 skip: (+p! - 1) * +limit,
             })
 
-            console.log(productSales);
-            
-
             const totalGross = await prisma.orderItem.aggregate({
                 where: {
                     productVariant: {
@@ -212,12 +209,12 @@ export class SalesController {
                             slug
                         }
                     },
-                    warehouseId: warehouse 
-                    ? warehouse.id
-                    : {not: undefined},
                     updatedAt: {gte: fromDate, lte: toDate},
                     order: {
-                        status: 'COMPLETED'
+                        status: 'COMPLETED',
+                        warehouseId: warehouse 
+                        ? warehouse.id
+                        : {not: undefined},
                     }
                 },
                 _sum: {
