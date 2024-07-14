@@ -19,6 +19,7 @@ export class SalesController {
                     warehouseName: String(w)
                 }
             })
+
             const salesProduct = await prisma.product.findMany({
                 where: {
                     name: q 
@@ -89,6 +90,9 @@ export class SalesController {
             
             const totalSales = await prisma.orderItem.aggregate({
                 where: {
+                    order: {
+                        status: 'COMPLETED'
+                    },
                     warehouseId: warehouse ? warehouse.id : { not: undefined },
                     productVariant: {
                         product: {
@@ -115,6 +119,7 @@ export class SalesController {
                 },
                 _count: true
             })
+
 
             res.status(200).send({
                 status: 'ok',

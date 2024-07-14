@@ -93,7 +93,7 @@ export default function Page() {
     
     return (
       <div className="flex flex-col w-full min-h-screen">  
-       <div className='flex gap-5 mb-7 lg:mb-14 md:gap-10 max-md:flex-wrap z-10'>
+       <div className='flex gap-5 mb-7  w-fit lg:w-full lg:mb-14 md:gap-10 max-md:flex-wrap z-10'>
             <div className='w-full flex items-center text-black/60 gap-0 max-lg:hidden'>
             <Button variant={'ghost'} className='w-5 max-sm:h-5 sm:w-10 p-0'>
                 <Link href={'/admins/stocks/'} >

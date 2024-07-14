@@ -152,7 +152,7 @@ export async function listWarehouse() {
       },
       {
         id: 'fd29abfe-67b7-4c29-bfbd-0df0c575e13a',
-        warehouseName: 'Hiu & Buaya',
+        warehouseName: 'Hiu dan Buaya',
         coordinate: 'Jalan Genteng Muhammadiyah, Ketabang - Genteng - Surabaya, Genteng, Genteng, Surabaya, Indonesia, Kota Surabaya, Jawa Timur, Indonesia',
         address: 'Jalan Genteng Muhammadiyah, Ketabang - Genteng - Surabaya, Genteng, Genteng, Surabaya, Indonesia',
         city_id: '444',

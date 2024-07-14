@@ -44,7 +44,7 @@ export function ProductCarousel({product, setIndex, index}:ICarousel) {
             <div>
               <Card className="rounded-none">
                 <CardContent className="flex p-0 aspect-square items-center justify-center">
-                  <Image alt={product.id} src={product.thumbnailURL} width={500} height={500} className="object-cover object-center sm:w-[500x] sm:h-[500] md:w-[330px] md:h-[330px] lg:w-[400px] lg:h-[400px] xl:w-[500px] xl:h-[500px]"/>
+                  <Image alt={product.id} src={product.thumbnailURL} width={500} height={500} className="object-cover object-center w-[320px] h-[320px] sm:w-[500x] sm:h-[500] md:w-[330px] md:h-[330px] lg:w-[400px] lg:h-[400px] xl:w-[500px] xl:h-[500px]"/>
                 </CardContent>
               </Card>
             </div>
