@@ -35,7 +35,6 @@ interface IStockTable {
               <TableHead className="text-center min-w-32">City Destination</TableHead>
               <TableHead className="text-center max-w-52">Quantity</TableHead>
               <TableHead className="text-center">Gross</TableHead>
-              <TableHead className="text-center"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -93,7 +93,7 @@ export default function SalesDetail () {
   return (
     <div className='p-4 sm:p-8 lg:px-10 lg:py-6'>  
 
-      <div className='flex w-full mb-7 items-center max-sm:flex-col gap-y-7'>
+      <div className='flex mb-7 w-fit lg:w-full items-center max-sm:flex-col gap-y-7'>
         <div className='w-full flex items-center gap-0 text-black/60 max-lg:hidden'>
           <Button variant={'ghost'} className='w-5 max-sm:h-5 sm:w-10 p-0'>
               <Link href={'/admins/sales/'} >
@@ -102,7 +102,7 @@ export default function SalesDetail () {
           </Button>
           <h1 className='text-xl xl:text-2xl font-medium'>Product Sales Details</h1>
         </div>
-        <div className='flex flex-col mb-7 w-fit lg:w-full items-start lg:items-end z-10'>
+        <div className='flex flex-col w-fit lg:w-full items-start lg:items-end z-10'>
           <WarehouseDropdown 
               selectedWH={selectedWH}
               setSelectedWH={setSelectedWH}
