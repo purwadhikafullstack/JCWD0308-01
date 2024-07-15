@@ -36,7 +36,6 @@ export default function Page({ params: { id } }: CheckoutProps) {
     const [isLoading, setIsLoading] = useState(true)
     const [isStockSufficient, setIsStockSufficient] = useState(true)
     const [notFound, setNotFound] = useState(false)
-console.log({userAddress});
 
     const router = useRouter()
 

@@ -169,9 +169,7 @@ export class AdminController {
     }
 
     async updatePhoto(req: Request, res: Response) {
-        try { 
-            console.log('updating admin photo')
-            console.log('adminId:',req.params.id)
+        try {
             const admin = await prisma.admin.findFirst({ where : { id: req.params.id }})
             if (admin) {
                 await prisma.admin.update({ where: { id: admin.id }, data: { imgUrl: req.body.imgUrl  } })

@@ -29,7 +29,6 @@ export const DescriptionField = ({description, setDescription, descErrorMessage,
           setDescErrorMessage('')
         }
         setDescription(desc)
-        console.log(descErrorMessage);
       }
   return (
     <FormField

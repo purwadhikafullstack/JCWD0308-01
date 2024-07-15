@@ -45,8 +45,6 @@ export default function PaginationOrder({ page, totalPages, urlParamName }: Pagi
     ].filter((page, index, self) => self.indexOf(page) === index);
 
     const showEllipsis = totalPages - currentPage > 3;
-    console.log(pages);
-    
 
     return (
         <Pagination>

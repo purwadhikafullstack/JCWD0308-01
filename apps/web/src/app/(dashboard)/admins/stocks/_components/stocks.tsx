@@ -62,7 +62,6 @@ export const Stocks = () => {
       const c = category == "All" ? '' : category
       const filter = {date, g, t, c, q}
       const res = await getAllStock(warehouse, page, 10, filter)
-      console.log(res);
       
       if (res.status == 'ok') {
         setProductQty(res.totalProduct)

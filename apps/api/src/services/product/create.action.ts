@@ -62,7 +62,6 @@ export async function createProduct(req: Request, res: Response) {
                                 stock: 0       
                             }
                         })
-                        console.log(wareHouseList[w].warehouseName);
                         
                     }
                 }

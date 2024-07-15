@@ -49,9 +49,6 @@ export const MutationForm = ({selectedWH, setOpen}:IMutationForm) => {
         }
     }
 
-    console.log(selectedWH);
-    
-
     useEffect(() => {
         const getData = async () => {
             const res = await getProductName('')
@@ -66,8 +63,6 @@ export const MutationForm = ({selectedWH, setOpen}:IMutationForm) => {
         getData()
     }, [selectedWH])   
     
-    console.log(warehouseList)
-
     useEffect(() => {
         if (selectedProd) {
             const getData = async() => {

@@ -167,9 +167,7 @@ export class OrderController {
 
             for (const item of orderItems) {
                 const createMutationTransactions = await createMutationTransaction(warehouseId, 'TRANSACTION', 'ACCEPTED')
-                console.log(createMutationTransactions);
-                const itemMutation = await createMutationItem(createMutationTransactions.id, item.quantity, warehouseId, item.productVariantId, item.size)
-                console.log(itemMutation);
+                await createMutationItem(createMutationTransactions.id, item.quantity, warehouseId, item.productVariantId, item.size)
             }
 
             const order = await updateToOrder(orderId, shippingCost, subTotal, warehouseId, userAddress, shipping, selectedShipping.service, selectedShipping.description, selectedShipping.cost[0].etd)
@@ -181,7 +179,7 @@ export class OrderController {
                     },
                     expiry: {
                         unit: 'minutes',
-                        duration: 10
+                        duration: 60
                     }
                 }
                 const paymentLink = await getPaymentLink(data)

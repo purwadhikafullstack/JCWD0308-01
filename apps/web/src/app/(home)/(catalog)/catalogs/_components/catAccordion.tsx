@@ -28,8 +28,6 @@ export function CatAccordion({gender, activeCat}:{gender:string, activeCat:IActi
     useEffect(() => {
       const getData = async() => {
         const res = await getCategory((gender ? gender.toLowerCase() : 'women'), '')
-        console.log(res);
-        
         setData(res)
       }
       getData()

@@ -599,9 +599,6 @@ export class StockController {
                     },
                     });
 
-                    console.log(toDateStockIn);
-                    
-                
                     const toDateStockOut = await prisma.stockMutationItem.aggregate({
                     _sum: {
                         quantity: true,
@@ -636,8 +633,6 @@ export class StockController {
                     },
                     });
                     
-                    console.log(toDateStockOut);
-
                     const toDateStock = (toDateStockIn._sum.quantity?  toDateStockIn._sum.quantity : 0) - (toDateStockOut._sum.quantity ? toDateStockOut._sum.quantity : 0)
                 
                     return {

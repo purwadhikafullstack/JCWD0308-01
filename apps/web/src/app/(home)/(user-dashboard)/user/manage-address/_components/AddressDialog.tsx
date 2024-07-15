@@ -26,9 +26,6 @@ export function AddressDialog({ children, btnText, editAddress, id }: { children
     const fetchProvinces = async () => {
         try {
             const data = await getProvinces();
-            console.log(data);
-            console.log('test');
-            
             setProvinces(data.rajaongkir.results);
         } catch (err) {
             console.log(err);
@@ -68,12 +65,11 @@ export function AddressDialog({ children, btnText, editAddress, id }: { children
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             let href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
-            // console.log(href)
 
         }
 
         function errorCallback(error: any) {
-            console.log(error)
+            toast.error('Error fetching your location')
         }
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {

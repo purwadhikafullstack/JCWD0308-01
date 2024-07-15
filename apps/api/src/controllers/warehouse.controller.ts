@@ -86,7 +86,6 @@ export class WarehouseController {
     async getWarehouseFiltered(req: Request, res: Response) {
         try {
             const {filter} = req.params
-            console.log(filter);
             const warehouseList = await prisma.warehouse.findMany({
                 where: {
                     warehouseName: {not: filter}
