@@ -99,9 +99,6 @@ export class ProductController {
                             }
                         }
                     },
-                    orderBy: {
-                        updatedAt: 'desc'
-                    },
                     take: +limit, 
                     skip: (+p! - 1) * +limit
                 })
@@ -284,8 +281,6 @@ export class ProductController {
                                 category: true
                             }
                         })
-
-                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -335,7 +330,6 @@ export class ProductController {
                                 category: true
                             }
                         })
-                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -365,9 +359,6 @@ export class ProductController {
                             },
 
                         })
-                        
-                        console.log(sizeSum);
-                        
                         
                         return res.status(200).send({
                             status: 'ok',
@@ -412,7 +403,6 @@ export class ProductController {
                                 category: true
                             }
                         })
-                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -465,7 +455,6 @@ export class ProductController {
                                 category: true
                             }
                         })
-                        if (!products) throw 'No product found.'
                         const productsWithStock = {
                             ...products,
                             variants: products!.variants.map((variant:any) => ({
@@ -581,7 +570,7 @@ export class ProductController {
             const products = await prisma.product.findMany({
                 where: {
                     name: q
-                    ? String(q)
+                    ? {contains:String(q)}
                     : {not: undefined},
                     category: {
                         slug: c 
@@ -620,7 +609,6 @@ export class ProductController {
                 }
             });
             
-            // Calculate total stock for each variant and product
             const productsWithStock = products.map(product => ({
                 ...product,
                 variants: product.variants.map(variant => ({
@@ -634,22 +622,17 @@ export class ProductController {
                 totalStock: product.variants.reduce((total, variant) => total + variant.totalStock, 0),
             }));
             
-            
-            // Separate products with stock from those without stock
             const productsWithStockOnly = productWithAndWithoutStock.filter(product => product.totalStock > 0);
             const productsWithoutStockOnly = productWithAndWithoutStock.filter(product => product.totalStock === 0);
             
-            // Combine both lists with products with stock first
             const combinedProductList = [...productsWithStockOnly, ...productsWithoutStockOnly];
             
-            // Apply pagination to the combined list
             const paginatedProductList = combinedProductList.slice((+p! - 1) * +limit, +p! * +limit);
 
-            
             const totalProduct = await prisma.product.count({
                 where: {
                     name: q
-                    ? String(q)
+                    ? {contains: String(q)}
                     : {not: undefined},
                     category: {
                         slug: c 

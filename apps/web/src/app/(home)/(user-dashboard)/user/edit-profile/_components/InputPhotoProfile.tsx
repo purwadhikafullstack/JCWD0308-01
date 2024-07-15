@@ -8,7 +8,6 @@ export function InputPhotoProfile({ setFile }: { setFile: React.Dispatch<React.S
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const selectedFile = event.target.files[0];
-            // console.log(selectedFile)
             if (selectedFile) {
                 const fileType = selectedFile.type;
                 const fileSize = selectedFile.size;

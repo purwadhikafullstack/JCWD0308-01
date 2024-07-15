@@ -4,7 +4,6 @@ import { verify } from "jsonwebtoken";
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log('check token')
         let token = req.headers.authorization?.replace('Bearer ', '')
         if (!token) throw new Error("Token not found!");
         

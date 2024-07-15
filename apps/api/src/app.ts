@@ -68,11 +68,11 @@ export default class App {
   }
 
   private setupScheduler(): void {
-    cron.schedule('0 */4 * * *', async () => {
+    cron.schedule('0 */1 * * *', async () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const fourHoursAgo = new Date()
-      fourHoursAgo.setDate(fourHoursAgo.getHours() - 1)
+      const oneHoursAgo = new Date()
+      oneHoursAgo.setDate(oneHoursAgo.getHours() - 1)
 
       try {
         const ordersToUpdate = await prisma.order.findMany({
@@ -92,7 +92,7 @@ export default class App {
         }
 
         const failedOrder = await prisma.order.findMany({
-          where: { status: 'PENDING_PAYMENT', paymentStatus: 'PENDING', createdAt: { lt: fourHoursAgo } }
+          where: { status: 'PENDING_PAYMENT', paymentStatus: 'PENDING', createdAt: { lt: oneHoursAgo } }
         })
 
         for (const order of failedOrder) {
@@ -102,7 +102,6 @@ export default class App {
           });
         }
 
-        console.log('Daily job completed');
       } catch (error) {
         console.error('Error running daily scheduler job:', error);
       }

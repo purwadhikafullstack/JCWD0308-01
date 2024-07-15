@@ -62,14 +62,12 @@ export default function AdminMenu({ admin }: { admin: IAdmin | null }) {
                 if (file) imgUrl = await uploadFile(file, 'profile')
                 const res = await patchRequest({ imgUrl: imgUrl }, `admin/${admin.id}`)
                 const data = await res.json()
-                console.log(data)
                 if (res) setIsloading(false)
                 if (res.ok) {
                     setFile(null)
                     toast.success('Photo profile has been updated')
                     const resUser = await (await getRequest(`admin/${admin.id}`)).json()
                     const currentUser = resUser.data
-                    console.log(resUser)
                     setCurrentPhotoProfile(currentUser.imgUrl)
                 } else if (res.status == 404) {
                     toast.error('User not found!')

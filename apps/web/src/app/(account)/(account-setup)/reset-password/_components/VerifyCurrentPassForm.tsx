@@ -64,7 +64,6 @@ export function VerifyCurrentPassForm({ className } : { className: string }) {
                 }
             }
         } catch (error) {
-            console.log(error)
             setIsLoading(false)
             toast.error("Oops, server might be down", { description: 'or token invalid' })
         }

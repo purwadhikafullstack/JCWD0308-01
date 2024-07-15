@@ -38,9 +38,6 @@ export const Catalogs = () => {
     getData(page)
   }, [params, page, sort])
 
-  console.log(productQty);
-  
-
   return (
     <div className={`w-full flex flex-col justify-between min-w-[332px] sm:min-w-[520px] xl:min-w-[800px] ${productQty == 0 && !isLoading ? 'h-[100vh]' : 'min-h-[50vh]'}`}>
       <div>

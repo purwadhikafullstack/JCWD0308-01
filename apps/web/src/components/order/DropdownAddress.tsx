@@ -21,7 +21,6 @@ export default function DropdownAddress({ setUserAddress, setWarehouseId }: Drop
     const [addressList, setAddressList] = useState<Address[]>([]);
     const [warehouse, setWarehouse] = useState<Warehouse | null>(null)
     const [labelAddress, setLabelAddress] = useState('');
-    console.log(addressList);
 
     const fetchProvinces = async () => {
         try {

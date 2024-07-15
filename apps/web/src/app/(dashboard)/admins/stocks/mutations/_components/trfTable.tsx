@@ -46,7 +46,6 @@ export function TransferTable({selectedWH, open, setOpen, getQty}:IHistoryTable)
 
   const handleAccept = async (id:string) => {
     const res = await acceptRequest(id)
-    console.log(res);
     
     if (res.status == 'ok') {
       toast.success('Stock successfully transfered.')
