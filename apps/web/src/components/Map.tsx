@@ -57,7 +57,8 @@ export default function Map({ setCurrentCity, setCurrentProvince, setLngLat, set
             const results = await maptilersdk.geocoding.reverse([lng, lat]);
             if (results.features) {
                 const countryId = results.features.filter(item => item.place_type_name[0] == 'country')[0].id
-                if (countryId == 'country.148') {
+                const placeName = results.features.filter(item => item.place_type_name[0] == 'country')[0].place_name
+                if (countryId == 'country.124' || placeName == 'Indonesia') {
                     const province = results.features.filter(item => item.place_type_name[0] == 'province')[0].text
 
                     const provinceMapping: { [key: string]: string } = {
